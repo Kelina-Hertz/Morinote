@@ -1,53 +1,160 @@
-# Morinote
+# 原来在动漫社真的能邂逅美少女！
 
-《原来在动漫社真的能邂逅美少女！》Ren'Py 游戏工程，游戏内社团为「青枫动漫社」。当前工程版本：`test_demo`，基准分辨率：1920 × 1080。
+> **Morinote** —— A galgame demo produced by Aoikaze,HUST
 
-## 获取工程
+![Ren'Py](https://img.shields.io/badge/Ren%27Py-8.3%2B-ff69b4)
+![Version](https://img.shields.io/badge/version-test__demo-blue)
+![Language](https://img.shields.io/badge/language-简体中文-brightgreen)
+![Resolution](https://img.shields.io/badge/1920×1080-informational)
+![Status](https://img.shields.io/badge/status-开发中-orange)
 
-安装 [Git](https://git-scm.com/)、[Git LFS](https://git-lfs.com/) 和 [Ren'Py SDK](https://www.renpy.org/release_list.html)。本次上传时本地配套 SDK 为 **Ren'Py 8.5.3**；SDK 自身不放入仓库。
-
-```sh
-git lfs install
-git clone https://github.com/Kelina-Hertz/Morinote.git
-cd Morinote
-git lfs pull
-```
-
-请使用 Git 克隆获取素材。图片、PSD、音频和字体由 Git LFS 管理；尚未下载 LFS 文件时，文件内容只是一小段指针文本。
-
-在 Ren'Py 启动器的设置中，将“项目目录”指向本工程文件夹的上一级，选择 `Morinote` 并启动项目。
+---
 
 ## 目录
 
-- `game/*.rpy`：剧情、系统、菜单和界面脚本。
-- `game/gui/`、`game/images/`：界面、角色及场景素材；现有 PSD 源文件一并保留。
-- `game/audio/`：音乐及音效。
-- `game/test_script/`：现有自定义界面脚本。
-- `game/tl/`：翻译及公共文本。
-- `project.json`：现有 Ren'Py 项目配置。
+- [原来在动漫社真的能邂逅美少女！](#原来在动漫社真的能邂逅美少女)
+  - [目录](#目录)
+  - [游戏简介](#游戏简介)
+  - [已实现系统](#已实现系统)
+  - [快速开始](#快速开始)
+    - [使用 Ren'Py Launcher（推荐）](#使用-renpy-launcher推荐)
+    - [构建发行版](#构建发行版)
+  - [项目结构](#项目结构)
+    - [关于仓库内容](#关于仓库内容)
+  - [开发进度](#开发进度)
+  - [制作人员](#制作人员)
+  - [素材与授权说明](#素材与授权说明)
+  - [免责声明](#免责声明)
 
-## 日常协作
+---
 
-开始修改前先更新本地分支；多人并行修改时，建议各建分支，通过 Pull Request 合并。示例：
+## 游戏简介
 
-```sh
-git switch main
-git pull --ff-only
-git switch -c feature/menu-update
-# 在编辑器中修改并在 Ren'Py 中检查后：
-git add .
-git commit -m "Update menu UI"
-git push -u origin feature/menu-update
+| 项目 | 内容 |
+|---|---|
+| 类型 | 日常 / 校园 / 恋爱喜剧，视觉小说 |
+| 引擎 | [Ren'Py](https://www.renpy.org/) 8.3+（Python 3.12） |
+| 分辨率 | 1920 × 1080 |
+| 语言 | 简体中文 |
+| 当前版本 | `test_demo`（第一章试玩） |
+| 游玩时长 | 约 20 分钟（Demo 主线内容，视阅读速度） |
+| 平台 | Windows |
+
+---
+
+## 已实现系统
+
+- **手机聊天系统** —— 仿 QQ / 微信的对话界面，支持己方 / 对方 / 旁白三种气泡、头像、逐条发送音效。
+- **通讯录系统** —— 联系人与群聊列表、最后一条消息预览、未读红点与数字（超过 99 显示 `99+`）、好友申请弹窗（同意 / 拒绝）。
+- **音量分轨** —— 音效、音乐、语音三轨独立调节（Ren'Py 内置混音器）。
+- **OVA 阅读系统** —— 独立的篇章阅读界面，记录已读进度。
+- **成就系统** —— 基于 Ren'Py 原生 `achievement` 模块，内置 7 个成就，支持 Steam 同步。
+- **UI 音效** —— 按钮悬停 / 点击音效统一挂载。（注：当前音效已被撤换，目前此功能暂时为空）
+
+---
+
+## 快速开始
+
+### 使用 Ren'Py Launcher（推荐）
+
+1. 到 [Ren'Py 官网](https://www.renpy.org/latest.html) 下载 **Ren'Py 8.3 或更新版本** 的 SDK 并解压。
+2. 运行 `renpy.exe`（macOS 为 `renpy.app`）打开 Launcher。
+3. 把本项目文件夹放到 Launcher 的**项目目录**下（或修改 `偏好设置 → 项目目录` 指向本项目所在路径）。
+4. 在项目列表中选择 `Morinote`，点击 **启动项目**。
+
+### 构建发行版
+
+Launcher 中选中项目 → **构建发行版（Build Distributions）** → 勾选目标平台 → **构建**。
+产物位于项目根目录的 `dist/` 下。
+
+> 代码中已通过 `build.classify` 排除 `**.bak`、`**~`、`thumbs.db` 等临时文件，PSD 源文件不会被一起打包。
+
+---
+
+## 项目结构
+
+```
+Morinote/
+├── game/
+│   ├── script_c1a.rpy          第一章 A 节游戏脚本
+│   ├── script_c1b.rpy          第一章 B 节游戏脚本
+│   ├── script_c1c.rpy          第一章 C 节游戏脚本
+│   ├── message.rpy             手机聊天剧本（phonemsg_* 标签）
+│   ├── message_system.rpy      聊天界面布局与气泡样式
+│   ├── contact_system.rpy      通讯录 / 好友申请 / 未读计数（demo阶段暂未启用）
+│   ├── achievements.rpy        成就表与解锁逻辑
+│   ├── ova.rpy                 OVA 目录与阅读界面
+│   ├── ova_script.rpy          OVA 篇章正文（目前以test_OVA作为临时脚本，正式OVA完成后将替换）
+│   ├── screens.rpy             全局界面定义
+│   ├── gui.rpy                 界面样式与配色
+│   ├── options.rpy             游戏配置（标题、版本、存档目录等）
+│   ├── settings.rpy            立绘 / 场景图像定义与位置参数
+│   ├── 00_ui_sounds.rpy        UI 音效挂载（目前暂未启用）
+│   ├── audio/                  BGM 与音效（.mp3 / .ogg）
+│   ├── gui/                    界面素材、场景背景、角色立绘、头像等UI组件
+│   ├── images/                 道具图标等杂项图片（现阶段暂未使用）
+│   ├── characters/             立绘源文件（仅作存档）
+│   ├── test_script/            界面定制脚本（与测试脚本无关，仅为临时UI设计脚本，后期将进行替换）
+│   ├── tl/                     翻译文件
+│   ├── cache/                  运行时生成的字节码缓存（可删）
+│   └── saves/                  存档与 persistent 数据（构建发行版将自动删除）
+├── project.json                Ren'Py 工程描述文件
+└── .vscode/settings.json       编辑器排除规则
 ```
 
-已有本地修改时先提交或暂存，再切换分支或更新。`.gitattributes` 会自动将相应素材放入 Git LFS；新增素材时保持此文件生效。PSD 等二进制素材无法逐行合并，修改同一文件前请先在团队内协调。
+### 关于仓库内容
 
-`.gitignore` 已排除存档、运行日志、可重新生成的脚本编译文件、缓存、编辑器本地设置和备份。这些文件仍保留在原电脑上，无需提交。
+本仓库按**完整工程目录**上传，包含源码、美术源文件、音频与运行缓存。其中：
 
-## 首次导入说明（2026-10-19）
+- `game/cache/`、`game/saves/`、`*.rpyc` 为运行时自动生成，删除后 Ren'Py 会重新编译生成；
+- `game/saves/` 内是本机测试存档，与游戏逻辑无关；
+- `game/gui/characters/**/*.psd` 为美术源文件，游戏运行不需要，现保留以便后续修改。
 
-来源为本地 `G:/Morinote/Morinote`。本次导入保留现有游戏脚本、素材及带 ` (1)` 的副本，未修改剧情、界面实现或素材内容。
+---
 
-- 部分带 ` (1)` 的脚本与无后缀文件内容不同；Ren'Py 会扫描 `.rpy`，同名 label、screen 或定义可能发生冲突。后续整理前请先比较文件并确认保留版本，不要直接批量删除。
-- `game/phone_main.rpyc` 和 `game/phone_main (1).rpyc` 没有对应源文件，因此作为例外保留。若找到原始 `.rpy`，建议补回源码后再整理。
-- 首次上传只验证版本控制、文件完整性和远程同步；不代表现有游戏已经通过运行或发行测试。
+## 开发进度
+
+- [o] 手机聊天 / 通讯录 / 好友申请核心系统
+- [o] 成就系统与 Steam 对接预留
+- [o] OVA 阅读模块
+- [o] 第一章 A 节（`C1a`）
+- [o] 第一章 B 节（`C1b1` – `C1b3`）
+- [o] 第一章 C 节（`C1c1` – `C1c3`）
+- [ ] 第一章演出细化与文本校对打磨
+- [ ] 正式版 UI 与配乐替换
+- [ ] OVA脚本制作与替换
+
+> 当前为**试玩测试版**，不代表最终版本的内容与品质。
+
+---
+
+## 制作人员
+
+| 职位 | 成员 |
+|---|---|
+| 总策划 | 小野寺日向 |
+| 原案 & 编剧 | HUST基米 |
+| 脚本 | 洛鸢羽、HUST基米 |
+| 作画 | 枝冬 |
+| 美术设计 | Ela |
+| 背景 CG | Venwil |
+| 音乐 | 洛鸢羽、柯良、ハサミ |
+| 制作 | 洛鸢羽、Ela、框 |
+
+
+---
+
+## 素材与授权说明
+
+- `game/audio/` 下的 BGM 、`game/gui/` 下的美术资源归对应的音乐制作人员与作画人员所有。
+- 引擎与运行库版权归 [Ren'Py](https://www.renpy.org/) 项目及其贡献者所有。
+
+---
+
+## 免责声明
+
+本作品纯属虚构。游戏中一切人名、地名、组织名等均为架空设计，与现实无任何关联，如有雷同纯属巧合。
+本作品适合 **14 周岁以上**人群，所有登场人物均已年满十八周岁。
+制作组保留对游戏内容的最终解释权。
+
+
