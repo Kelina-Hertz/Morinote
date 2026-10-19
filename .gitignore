@@ -1,0 +1,41 @@
+# Ren'Py generated files, caches, and personal saves.
+*.rpyc
+*.rpymc
+*.rpyb
+/game/cache/
+/game/saves/
+*.save
+
+# These original modules have no matching source in this import.
+!/game/phone_main.rpyc
+!/game/phone_main (1).rpyc
+
+# Runtime diagnostics and editor backups.
+log.txt
+log (*).txt
+errors.txt
+errors (*).txt
+traceback.txt
+traceback (*).txt
+*.bak
+*.tmp
+*.temp
+*~
+
+# Local editor, operating-system, and Python files.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
+*.pyo
+
+# Local configuration and credentials.
+.env
+.env.*
+!.env.example
+
+# Generated distribution packages.
+/build/
+/dist/
