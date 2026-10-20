@@ -1,0 +1,4 @@
+interface:
+  display_name: "Word 剧本导入 Morinote"
+  short_description: "解析 Word 剧本，保留正文、分支与来源，补齐素材需求并载入原生 IDE"
+  default_prompt: "使用 $morinote-word-import 将提供的 Word 剧本导入当前 Morinote IDE，保留正文和来源，缺素材使用占位或临时替代，暂不接入主线。"

@@ -1,0 +1,3 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+export default defineConfig(({command}) => ({ plugins: [react(), {name:'creator-content-security',transformIndexHtml(html:string){return command==='build'?html.replace('<head>',`<head><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: http://127.0.0.1:*; media-src 'self' blob: http://127.0.0.1:*; connect-src 'self' http://127.0.0.1:* http://localhost:*; worker-src 'self' blob:; object-src 'none'; frame-src 'none'">`):html;}}], base: './', server: { host: '127.0.0.1', proxy: { '/api': 'http://127.0.0.1:8766' } }, build: { outDir: 'dist' } }));

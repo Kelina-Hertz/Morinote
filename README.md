@@ -158,3 +158,33 @@ Morinote/
 制作组保留对游戏内容的最终解释权。
 
 
+
+## 可视化 IDE（无 AI 版）
+
+仓库新增独立的 [`creator/`](creator/README.md) 开发工具，版本 `0.2.21-no-ai.1`。支持剧情总图、三轨、素材库、源码编辑、草稿恢复和 Ren’Py 试玩，不含 AI 或 API Key 配置。
+
+仓库已包含 Windows x64 免安装包（`creator/portable/`，由 Git LFS 保存），内含 Electron、Python 和 Ren’Py 8.5.3，无需另外安装 Node.js、Python、Ren’Py 或构建源码。
+
+使用 Git + Git LFS 克隆仓库后，在仓库根目录运行：
+
+```powershell
+git lfs install
+git lfs pull
+```
+
+然后双击 [`creator/启动IDE.cmd`](creator/启动IDE.cmd)。首次启动校验压缩包并解压，之后直接启动；首次使用自动定位当前仓库的游戏。游戏图片、音频等 LFS 素材也需要完整下载。从 GitHub 网页下载的源码 ZIP 不保证包含 LFS 实体。
+
+开发构建说明见 [creator/README.md](creator/README.md#从源码构建)。免安装 ZIP 与校验清单进入 Git；解压缓存、开发依赖和构建目录不提交。
+
+IDE 独立于游戏：原有 Ren’Py 启动和构建方式继续使用。添加开发工具不会改写游戏文件；之后在 IDE 中保存的剧情和素材配置会写入对应源码。
+
+### Word 剧本导入
+
+提供共享 Skill：[morinote-word-import](.agents/skills/morinote-word-import/SKILL.md)。在 Codex 中打开本仓库并提供 Word 文件，可说：
+
+> 使用 $morinote-word-import 将这个 Word 剧本导入 IDE，保留原文和分支，缺素材使用占位或临时差分，暂不接入主线、不运行测试或试玩。
+
+Codex 负责理解剧本和生成原生 RPY；附带工具提取 Word、核对段落来源并刷新 IDE 索引。无需 IDE 内置 AI 或 API Key。详细流程见 [IDE README](creator/README.md#使用-codex-导入-word-剧本)。
+
+
+剧情总图默认展示第一章纵向主干，场景使用剧情名称，手机会话收进所属场景。名称与布局仅用于 IDE 展示，原 label 不变；同名编号源码副本单独列出，不自动删除。未引入 C2-1。

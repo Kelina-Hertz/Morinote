@@ -1,0 +1,66 @@
+{
+  "name": "morinote-ide-offline",
+  "version": "0.2.21-no-ai.1",
+  "private": true,
+  "description": "Local Morinote RenPy IDE without AI services",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "start": "electron .",
+    "typecheck": "tsc --noEmit",
+    "package:dir": "npm run build && node scripts/package.cjs"
+  },
+  "dependencies": {
+    "@xyflow/react": "^12.9.3",
+    "lucide-react": "^0.468.0",
+    "monaco-editor": "0.55.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.1"
+  },
+  "build": {
+    "appId": "studio.morinote.ide.offline",
+    "productName": "Morinote IDE",
+    "directories": {
+      "output": "release-0.2.21-no-ai.1"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json",
+      "!electron/tests/**/*",
+      "README.md",
+      "docs/*.md"
+    ],
+    "extraResources": [
+      {
+        "from": "backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          "!tests/**/*",
+          "!**/__pycache__/**/*"
+        ]
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "electronDist": "node_modules/electron/dist"
+  }
+}

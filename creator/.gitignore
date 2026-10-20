@@ -1,0 +1,13 @@
+node_modules/
+dist/
+release*/
+.cache/
+.checks/
+.test-projects/
+projects/
+__pycache__/
+*.pyc
+*.log
+
+# Extracted portable runtime cache. The distributable ZIP is tracked with LFS.
+.portable/

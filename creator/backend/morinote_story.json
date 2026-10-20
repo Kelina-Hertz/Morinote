@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "signature": ["C1a", "C1b1", "C1b2", "C1b3", "C1c1", "C1c2", "C1c3", "phonelabel_01"],
+  "scenes": {
+    "start": {"file": "script_c1a.rpy", "title": "考场外 · 告别高中", "group": "序章", "role": "story", "summary": "高考结束，录取通知书到来，过去的阴影仍未散去。"},
+    "test": {"file": "script_c1a.rpy", "title": "特典小说测试", "role": "test"},
+    "C1a": {"file": "script_c1a.rpy", "title": "噩梦醒后 · 动漫社的邀请", "group": "第一章 · 百团大会", "role": "story", "summary": "从高中噩梦中醒来，在宿舍与梦龙交谈，加入动漫社群。"},
+    "C1b1": {"file": "script_c1b.rpy", "title": "百团巡游 · 寻找动漫社", "group": "第一章 · 百团大会", "role": "story", "summary": "和梦龙逛百团大会，寻找青枫动漫社的摊位。"},
+    "C1b2": {"file": "script_c1b.rpy", "title": "摊位初遇 · 汐泉与渡鸥", "group": "第一章 · 百团大会", "role": "story", "summary": "摊位后台的 cosplay 筹备，与汐泉和渡鸥相遇。"},
+    "C1b3": {"file": "script_c1b.rpy", "title": "答题抽奖 · 组织部的邀约", "group": "第一章 · 百团大会", "role": "story", "summary": "答题与抽奖结束，收到组织部和社员大会的邀请。"},
+    "C1c1": {"file": "script_c1c.rpy", "title": "社员大会 · 与文竹同行", "group": "第一章 · 百团大会", "role": "story", "summary": "前往教学楼，遇见寻找活动室的文竹，一同参加大会。"},
+    "C1c2": {"file": "script_c1c.rpy", "title": "组织部宣讲 · 初识蓝雪", "group": "第一章 · 百团大会", "role": "story", "summary": "听组织部宣讲，参与自由交流，接过蓝雪的乐队传单。"},
+    "C1c3": {"file": "script_c1c.rpy", "title": "加入组织部 · 夜间的消息", "group": "第一章 · 百团大会", "role": "story", "summary": "决定加入组织部，接收群消息和三段私聊，迎来第一章收尾。"},
+    "phonelabel_01": {"file": "message.rpy", "title": "动漫社群 · 入群欢迎", "role": "conversation"},
+    "phonelabel_02": {"file": "message.rpy", "title": "组织部群 · 新人报到", "role": "conversation"},
+    "phonemsg_xiquan01": {"file": "message.rpy", "title": "汐泉 · 好友私聊", "role": "conversation"},
+    "phonemsg_duou01": {"file": "message.rpy", "title": "渡鸥 · 冬日 fes 预告", "role": "conversation"},
+    "phonemsg_hinata01": {"file": "message.rpy", "title": "日向 · 一天的留言", "role": "conversation"}
+  }
+}

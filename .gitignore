@@ -39,3 +39,7 @@ __pycache__/
 # Generated distribution packages.
 /build/
 /dist/
+
+# Project-local IDE index, recovery drafts, and optional SDK.
+.creator/
+/renpy-8.5.3-sdk/
