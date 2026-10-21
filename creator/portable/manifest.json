@@ -1,7 +1,7 @@
 {
-    "version":  "0.2.21-no-ai.1",
+    "version":  "0.2.22-no-ai.1",
     "platform":  "windows-x64",
-    "archive":  "Morinote-IDE-0.2.21-no-ai.1-win-x64.zip",
-    "bytes":  312846331,
-    "sha256":  "212211301cb41f51c8b47c9ba8a6c4067fd943327c0fd09d5f3a54d831f872f1"
+    "archive":  "Morinote-IDE-0.2.22-no-ai.1-win-x64.zip",
+    "bytes":  312849668,
+    "sha256":  "3c1b55ae8eb5f8057c920d5e0e550f871c8cff6ebe1cd5a7b8cd61b4f9bf238e"
 }

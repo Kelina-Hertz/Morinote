@@ -164,7 +164,7 @@ def update_owned(root,project,op,doc,i):
     ensure_owned(rows,block);start,end,original,indent=block;spec=copy.deepcopy(original)
     if op['operation']=='image':
         from .native_tracks import catalog
-        scripts=[(path,read_overlay(root,path,op.get('documents'))['content']) for path in project['nativeRenpy']['codeFiles'] if path.endswith('.rpy')]
+        scripts=[({'projectPath':path},read_overlay(root,path,op.get('documents'))['content']) for path in project['nativeRenpy']['codeFiles'] if path.endswith('.rpy')]
         cue=catalog(copy.deepcopy(project),scripts)[1].get(op['value'])
         if not cue:raise ValueError('请选择已登记且可以解析的图片标签。')
         intrinsic=cue['props'].get('zoom',1)

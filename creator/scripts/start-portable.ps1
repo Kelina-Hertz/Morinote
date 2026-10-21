@@ -1,4 +1,11 @@
+param([switch]$PrepareOnly)
 $ErrorActionPreference = 'Stop'
+function Get-ArchiveHash([string]$File) {
+    $stream = [IO.File]::OpenRead($File)
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-', '').ToLowerInvariant() }
+    finally { $stream.Dispose(); $algorithm.Dispose() }
+}
 try {
     $creatorRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
     $portableRoot = Join-Path $creatorRoot 'portable'
@@ -29,7 +36,7 @@ try {
     $markerPath = Join-Path $extractedRoot '.complete'
     if (-not ((Test-Path -LiteralPath $executable) -and (Test-Path -LiteralPath $markerPath) -and [IO.File]::ReadAllText($markerPath).Trim() -eq $expectedHash)) {
         Write-Host 'Preparing Morinote IDE. First launch extracts the bundled runtime; please wait...'
-        if ((Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash -ne $expectedHash) {
+        if ((Get-ArchiveHash $archivePath) -ne $expectedHash) {
             throw 'Portable archive checksum does not match. Download it again with git lfs pull.'
         }
         [IO.Directory]::CreateDirectory($cacheRoot) | Out-Null
@@ -52,6 +59,7 @@ try {
         }
         Move-Item -LiteralPath $temporaryRoot -Destination $extractedRoot -ErrorAction Stop
     }
+    if ($PrepareOnly) { Write-Output $executable; exit 0 }
     Start-Process -FilePath $executable -WorkingDirectory (Split-Path -Parent $executable) -WindowStyle Normal
 } catch {
     Write-Host ('Unable to start Morinote IDE: ' + $_.Exception.Message) -ForegroundColor Red

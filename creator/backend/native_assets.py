@@ -137,8 +137,13 @@ def augment(project, scripts, images, constants):
             label = key if kind != 'file' else Path(key).stem
             name = asset.get('name') or label
             if name == ' / '.join(asset.get('nativeAliases', [])): name = label
+            character = asset.get('character', '')
+            parts = Path(asset.get('nativeGamePath', '')).parts
+            if not character and asset.get('kind') == 'sprite' and 'characters' in parts:
+                position = parts.index('characters') + 1
+                if position < len(parts): character = ROLES.get(parts[position], '')
             entries[eid] = {'id': eid, 'runtime': {'kind': kind, 'key': key}, 'name': name,
-                'type': inferred_type(asset, project), 'character': ROLES.get(asset.get('character', ''), asset.get('character', '')), 'costume': asset.get('costume', ''),
+                'type': inferred_type(asset, project), 'character': ROLES.get(character, character), 'costume': asset.get('costume', ''),
                 'expression': asset.get('expression', ''), 'requirement': asset.get('requirement', ''), 'category': '/'.join(reversed(category)),
                 'binding': target or {'kind': 'original' if kind == 'image' else 'file', 'key': key},
                 'temporary': asset.get('status') == 'placeholder', 'override': False,

@@ -1,5 +1,5 @@
 import {lazy,Suspense,useCallback,useEffect,useMemo,useRef,useState} from 'react';
-import {BookOpen,FolderOpen,Save,Undo2,Redo2,Play,Code2,GitBranch,Image,ChevronDown,ChevronRight,File,Plus,RefreshCw,Square,X,Move,ExternalLink} from 'lucide-react';
+import {BookOpen,FolderOpen,Save,Undo2,Redo2,Play,Code2,GitBranch,Image,ChevronDown,ChevronRight,File,Plus,RefreshCw,Square,X,Move,ExternalLink,Settings2} from 'lucide-react';
 import type {Asset,Diagnostic,PreviewStatus,Project,ProjectResponse} from './types';
 import type {ConfigField,SourceDocument,SourceLocation,TreeNode,WorkspaceIndex,NativeOperation} from './native-types';
 import {api,currentProjectSession} from './api';

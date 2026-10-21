@@ -1,4 +1,10 @@
 $ErrorActionPreference = 'Stop'
+function Get-ArchiveHash([string]$File) {
+    $stream = [IO.File]::OpenRead($File)
+    $algorithm = [Security.Cryptography.SHA256]::Create()
+    try { return [BitConverter]::ToString($algorithm.ComputeHash($stream)).Replace('-', '').ToLowerInvariant() }
+    finally { $stream.Dispose(); $algorithm.Dispose() }
+}
 $creatorRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $package = [IO.File]::ReadAllText((Join-Path $creatorRoot 'package.json')) | ConvertFrom-Json
 $version = [string]$package.version
@@ -20,7 +26,7 @@ $manifest = [ordered]@{
     platform = 'windows-x64'
     archive = $archiveName
     bytes = (Get-Item -LiteralPath $temporaryArchive).Length
-    sha256 = (Get-FileHash -LiteralPath $temporaryArchive -Algorithm SHA256).Hash.ToLowerInvariant()
+    sha256 = Get-ArchiveHash $temporaryArchive
 }
 $manifestPath = Join-Path $portableRoot 'manifest.json'
 $temporaryManifest = Join-Path $portableRoot ('manifest-' + [guid]::NewGuid().ToString('N') + '.tmp')

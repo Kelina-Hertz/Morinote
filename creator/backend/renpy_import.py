@@ -195,7 +195,7 @@ def index_sources(root, document, previous=None, source_contents=None):
                     continue
                 if not isinstance(value, str) or Path(value).suffix.lower() not in IMAGE | AUDIO or any(c in value for c in '[{'):
                     continue
-                if '/' in value and value.replace('\\', '/').removeprefix('./') not in known_resources:
+                if value.replace('\\', '/').removeprefix('./') not in known_resources:
                     hard=image_context or bool(re.match(r'(?:image|scene|show|play|voice|add)\b|(?:define|default)\s+(?:audio\.|phone_|config\.)',raw.lstrip()))
                     resource_hints.append({'file': game_path, 'line': number, 'path': value,'required':hard})
     by_name = {}

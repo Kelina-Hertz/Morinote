@@ -1,6 +1,6 @@
 {
   "name": "morinote-ide-offline",
-  "version": "0.2.21-no-ai.1",
+  "version": "0.2.22-no-ai.1",
   "private": true,
   "description": "Local Morinote RenPy IDE without AI services",
   "main": "electron/main.cjs",
@@ -9,7 +9,8 @@
     "build": "vite build",
     "start": "electron .",
     "typecheck": "tsc --noEmit",
-    "package:dir": "npm run build && node scripts/package.cjs"
+    "package:dir": "npm run build && node scripts/package.cjs",
+    "test": "node scripts/test.cjs"
   },
   "dependencies": {
     "@xyflow/react": "^12.9.3",
@@ -31,7 +32,7 @@
     "appId": "studio.morinote.ide.offline",
     "productName": "Morinote IDE",
     "directories": {
-      "output": "release-0.2.21-no-ai.1"
+      "output": "release-0.2.22-no-ai.1"
     },
     "files": [
       "dist/**/*",
