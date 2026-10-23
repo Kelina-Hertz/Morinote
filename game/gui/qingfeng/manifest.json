@@ -1,0 +1,592 @@
+{
+  "design": "B / 剪贴色签 / 1013-v02",
+  "date": "2026-10-23",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "body_font": "SourceHanSansLite.ttf",
+  "main_visual": "original logo preserved; former icons removed in approved 1013 art",
+  "files": [
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-button-disabled.png",
+      "destination": "gui/qingfeng/components/button-disabled.png",
+      "sha256": "d6380cc156acd0a295064e9df2daaad6da7a0a0ff993af4b1e354c473677d251"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-button-focus.png",
+      "destination": "gui/qingfeng/components/button-focus.png",
+      "sha256": "09fe83ac0504c6dd309a24c735e26eb18cf72c3896f7076eeea235a831bca3ed"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-button-normal.png",
+      "destination": "gui/qingfeng/components/button-normal.png",
+      "sha256": "fc6e25ba7e842b10203001a1a45045f533efda3ff19437fc3ef4def1e6762d68"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-button-pressed.png",
+      "destination": "gui/qingfeng/components/button-pressed.png",
+      "sha256": "17b602b0ba24ed90d8f7641af178f1eb6cc453afed808d9dffe316ac26929400"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-button-selected-focus.png",
+      "destination": "gui/qingfeng/components/button-selected-focus.png",
+      "sha256": "7bf4f372c53a456aaf710a209a7d5c17d54264fda0b0c1bdf8c87c1d4e50d510"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-button-selected.png",
+      "destination": "gui/qingfeng/components/button-selected.png",
+      "sha256": "4b53ddac2ba433e569232d3723c180c465a8e7e43445914cc950457515de7478"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-choice-disabled.png",
+      "destination": "gui/qingfeng/components/choice-disabled.png",
+      "sha256": "ffce069a89927961189672a0c74c302616fdb1fd0602160689611e365408643d"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-choice-focus.png",
+      "destination": "gui/qingfeng/components/choice-focus.png",
+      "sha256": "358c84867d5ab48b0461f26f62368559adae6de4a45a5c5f25f0adeb2bf2f18d"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-choice-normal.png",
+      "destination": "gui/qingfeng/components/choice-normal.png",
+      "sha256": "192102bf59725cefa6575cf52ca2f2f61a934dccc0292be4f4f4f630e80bde70"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-choice-pressed.png",
+      "destination": "gui/qingfeng/components/choice-pressed.png",
+      "sha256": "b86b0373d6d3b8be82e507cba7236e52d6fbd99a5a72808071c73b5f0d414737"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-choice-selected-focus.png",
+      "destination": "gui/qingfeng/components/choice-selected-focus.png",
+      "sha256": "9ea7e328daa27a99cbc84caf75e54430652d9b03c353c161e952cbe20f4e3ff2"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-choice-selected.png",
+      "destination": "gui/qingfeng/components/choice-selected.png",
+      "sha256": "5cedcb4aab40c962983dc5e67603bab1accca0f10d1b0c6604fc68ed7478c9b2"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-dialogue.png",
+      "destination": "gui/qingfeng/components/dialogue.png",
+      "sha256": "36778ad5d80bd19f7ba153dc197fa8706aa0be2a4df254ee9b0694a82d1c2d8c"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-modal.png",
+      "destination": "gui/qingfeng/components/modal.png",
+      "sha256": "5a04b85c1513a1254119ad3e1521c1ad81d680bbe8979f3457dc0b0d143b842b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-name-demo.png",
+      "destination": "gui/qingfeng/components/name-demo.png",
+      "sha256": "224971e5024bba84416a0fbfd46ddbd50303e0f3a7961bd88fea6d2809bda6db"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-quick-disabled.png",
+      "destination": "gui/qingfeng/components/quick-disabled.png",
+      "sha256": "cc65ed8b110ada95fa7e2741823afb06f78231c1138c120557a397f4469ad38b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-quick-focus.png",
+      "destination": "gui/qingfeng/components/quick-focus.png",
+      "sha256": "ffbe2fd3fe2f4766062f9b405b24b6468e277e4b3bbb55af4e2b69b1ba6aa339"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-quick-normal.png",
+      "destination": "gui/qingfeng/components/quick-normal.png",
+      "sha256": "18526df1776b2ea379b3bf4ce3eab560a6fa53f1a25df6ad5d1c7a60a0d48369"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-quick-pressed.png",
+      "destination": "gui/qingfeng/components/quick-pressed.png",
+      "sha256": "002f2c5c33267e87dad5cb7ca7ac3874b3c6443de48992bc379947468803f82d"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-quick-selected-focus.png",
+      "destination": "gui/qingfeng/components/quick-selected-focus.png",
+      "sha256": "7c445ae52639a10367840d05f7da5e77ead5dd50a35d0bbd2905a8712d734920"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-quick-selected.png",
+      "destination": "gui/qingfeng/components/quick-selected.png",
+      "sha256": "183784d8cad284a2297bbfd72600d7517592fdb48f41d0f0f2e7fe4b30caeef1"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-range-empty.png",
+      "destination": "gui/qingfeng/components/range-empty.png",
+      "sha256": "c75f2183853bff209e26f32dfe6bbb12a65edc1190f0a6c0fb02a5a836280bb7"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-range-full.png",
+      "destination": "gui/qingfeng/components/range-full.png",
+      "sha256": "eda8a495b579d1d7e2788ad6998e3633ef8a8cbfd6216ac8df7a591506a64e8c"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-settings.png",
+      "destination": "gui/qingfeng/components/settings.png",
+      "sha256": "8a7e5b072ea37828bce0c8fb9da52e6b4dbfb3cafe5ec89e0d7db094a2c71038"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-slot-disabled.png",
+      "destination": "gui/qingfeng/components/slot-disabled.png",
+      "sha256": "fded5da5478caee1ba702e2f0ae3fe623abdbf3f71d69090423d4e9e6d9149ae"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-slot-focus.png",
+      "destination": "gui/qingfeng/components/slot-focus.png",
+      "sha256": "664c69d916c605a22ceac65e480d705920f973f50e2c8d784cc9251d3070a794"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-slot-normal.png",
+      "destination": "gui/qingfeng/components/slot-normal.png",
+      "sha256": "2dff7886f1cf90a2c52c0d390f9e47d4d4046a8f9bf030f2afef4378c35bccbe"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-slot-pressed.png",
+      "destination": "gui/qingfeng/components/slot-pressed.png",
+      "sha256": "c6a238e100c08b32537f591e6238f2bb63e9a76c0001c1092e74de6c6905bc0e"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-slot-selected-focus.png",
+      "destination": "gui/qingfeng/components/slot-selected-focus.png",
+      "sha256": "d92a45541db1d4fe2d4306d814806bc17cb4814ce5cb39e6fd4c2e156545df7f"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-slot-selected.png",
+      "destination": "gui/qingfeng/components/slot-selected.png",
+      "sha256": "d3e64c79061c1c34127ddd28978d6913df2dfeafff7eb551b9a326d5ee6df18d"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-tab-disabled.png",
+      "destination": "gui/qingfeng/components/tab-disabled.png",
+      "sha256": "07700b75354d681c2af62ab4a4e6f919d928b4750807e120d74b62cf6eb038de"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-tab-focus.png",
+      "destination": "gui/qingfeng/components/tab-focus.png",
+      "sha256": "4311ae9a68dba96129b645878e8f813e960cd0e50fd36d19006e72a03c34853b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-tab-normal.png",
+      "destination": "gui/qingfeng/components/tab-normal.png",
+      "sha256": "72cbb032fb9ba59593b78523c190ec723109509fd5da621470cc57e5e8980634"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-tab-pressed.png",
+      "destination": "gui/qingfeng/components/tab-pressed.png",
+      "sha256": "dd21c2633bf8637e4a6fc3fc342dbb87bf6442fb8537ec7096b1bda7277f4b0b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-tab-selected-focus.png",
+      "destination": "gui/qingfeng/components/tab-selected-focus.png",
+      "sha256": "810ad14c22a347617b38538b59d5e8b9090c765b90538d428465314d0c41db27"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-tab-selected.png",
+      "destination": "gui/qingfeng/components/tab-selected.png",
+      "sha256": "2509226f7f08917797151c9028179591c7fd6dcc9977714d73ec65fcfc886605"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-thumb-focus.png",
+      "destination": "gui/qingfeng/components/thumb-focus.png",
+      "sha256": "6c55d2cf2ec1f9c1444829b0bd6badffe21bd651278465d1ce3a5016cde49e7b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-thumb-normal.png",
+      "destination": "gui/qingfeng/components/thumb-normal.png",
+      "sha256": "11dd04a18161bc5170f75db9463b0c41cec4b0cdc6747fd652303b8de8511de7"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-toggle-disabled.png",
+      "destination": "gui/qingfeng/components/toggle-disabled.png",
+      "sha256": "42677d00aefd471ed4e4d52147b279ea4eead3252d17b8edfa13ac0a464c801e"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-toggle-off-focus.png",
+      "destination": "gui/qingfeng/components/toggle-off-focus.png",
+      "sha256": "f85997bf7ffc0e3477480238b9f40cec1b2af91e7370b6e9a9b7c9f664152312"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-toggle-off.png",
+      "destination": "gui/qingfeng/components/toggle-off.png",
+      "sha256": "c5502b1a0b759fe08f2b6297626d872759b4808d59441b6a89e134e3b56ec518"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-toggle-on-focus.png",
+      "destination": "gui/qingfeng/components/toggle-on-focus.png",
+      "sha256": "5757d4495c717544299b2fd24b4b5f9745321d82ab219d267d7ab2515e4cbb19"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\B-toggle-on.png",
+      "destination": "gui/qingfeng/components/toggle-on.png",
+      "sha256": "d0596cfdd2478a2fe1af5fcf515aa1185aa743764d6b08881b6888999ab76103"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-auto-ink.png",
+      "destination": "gui/qingfeng/icons/icon-auto-ink.png",
+      "sha256": "8ae52664bb828687ee17574801d12b16e1b29e0b4a0d5c42fc44171a326934cb"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-auto-muted.png",
+      "destination": "gui/qingfeng/icons/icon-auto-muted.png",
+      "sha256": "8bfaa77bd47295fdc2208a9640f18a4fc86e90e0825456c242e46b809b45735d"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-auto-white.png",
+      "destination": "gui/qingfeng/icons/icon-auto-white.png",
+      "sha256": "ba574640d30efa3aadcb9ef0133aee8f303eb8c8816fdec683bf3332815b7683"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-back-ink.png",
+      "destination": "gui/qingfeng/icons/icon-back-ink.png",
+      "sha256": "a7f8db8e64ef197506975e932f67a7cf5530b6834f6ebb255c2b91e307690fc8"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-back-muted.png",
+      "destination": "gui/qingfeng/icons/icon-back-muted.png",
+      "sha256": "4d69db8045d201c9e744e26fef2f981a4912a6da502e132a09d4f6c36f0ef2ce"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-back-white.png",
+      "destination": "gui/qingfeng/icons/icon-back-white.png",
+      "sha256": "d47b0feab73f468dda3d6c27b8ff44155a5381cbbeead9977bd4ff932989519f"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-check-ink.png",
+      "destination": "gui/qingfeng/icons/icon-check-ink.png",
+      "sha256": "38a9989f2289fa95806f29a02c64d1776061d56af93183d65a1b7c2486d6881c"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-check-muted.png",
+      "destination": "gui/qingfeng/icons/icon-check-muted.png",
+      "sha256": "0c1cb90b806c106d2f2ba1d5824b21179c3563e172dbb2f843b4651635240989"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-check-white.png",
+      "destination": "gui/qingfeng/icons/icon-check-white.png",
+      "sha256": "cf3fa3dd7a0ba5489e510435eba11aa7d15228544f71cfa7da931fd6ed1b4b70"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-close-ink.png",
+      "destination": "gui/qingfeng/icons/icon-close-ink.png",
+      "sha256": "8a1c951f65b828437a91a750ca45cb05e8c03827aef010d542475b0db97f735b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-close-muted.png",
+      "destination": "gui/qingfeng/icons/icon-close-muted.png",
+      "sha256": "e4dd86bd2e15b7a11579767a8e3606691c0c4f97dcf5053de3c668d5db911b34"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-close-white.png",
+      "destination": "gui/qingfeng/icons/icon-close-white.png",
+      "sha256": "d324197bc9a7aa158e080bc9ccb09485dfa490e603a06fcc8279aa92adbac887"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-history-ink.png",
+      "destination": "gui/qingfeng/icons/icon-history-ink.png",
+      "sha256": "c6358cc8b85e5dfe2886968b831efb4f60a5fe3de53cd47bc2dae34eccd347dc"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-history-muted.png",
+      "destination": "gui/qingfeng/icons/icon-history-muted.png",
+      "sha256": "8f4634f884490e2cb49b3d1640698372b865a35ac1603aafc1dad84419b5fcce"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-history-white.png",
+      "destination": "gui/qingfeng/icons/icon-history-white.png",
+      "sha256": "c9a3d7ab20a95c331b131fec7165cbcc373e5a92c035f062269dca47e9838a41"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-load-ink.png",
+      "destination": "gui/qingfeng/icons/icon-load-ink.png",
+      "sha256": "c0fceb044ff04fab4143bc218de51caefc5c3167816d08147e46c4ee4c4a16b1"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-load-muted.png",
+      "destination": "gui/qingfeng/icons/icon-load-muted.png",
+      "sha256": "307a82b31925cdf0414b2e416895cd751be615b3db1f2e2670e98d2da40617bf"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-load-white.png",
+      "destination": "gui/qingfeng/icons/icon-load-white.png",
+      "sha256": "174e48fc5feb40336337d314505ca47e550e11c107d6570c9fbf18833c116e65"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-next-ink.png",
+      "destination": "gui/qingfeng/icons/icon-next-ink.png",
+      "sha256": "66b4bd7e6b1e6208b362109b40bce163e8df4bb10bc3620c43e2b4806b23a9bb"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-next-muted.png",
+      "destination": "gui/qingfeng/icons/icon-next-muted.png",
+      "sha256": "70843b6c88bbe0bb305f3a953e2443b9fd10103155d4b2654fd75062b0d5d058"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-next-white.png",
+      "destination": "gui/qingfeng/icons/icon-next-white.png",
+      "sha256": "d617870070503e6998720e8bcffbdb33c01eb6f73b4d4eefe1539ce16e7b8b7b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-quit-ink.png",
+      "destination": "gui/qingfeng/icons/icon-quit-ink.png",
+      "sha256": "8f4f51d087545d60198fdc94eed3bb7ec3a84bcb821f94192da6dac3f095a322"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-quit-muted.png",
+      "destination": "gui/qingfeng/icons/icon-quit-muted.png",
+      "sha256": "ae5133675669ba7820cd0568946a35a581cbaaab3a9dfe4f0c808f7d50511888"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-quit-white.png",
+      "destination": "gui/qingfeng/icons/icon-quit-white.png",
+      "sha256": "bed26249aede443b6263e2bc536f02be93986f06c2a84b843e00ae8eb9aafe87"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-save-ink.png",
+      "destination": "gui/qingfeng/icons/icon-save-ink.png",
+      "sha256": "27ac1d06d908bfe07867ec81d320797ebd2b808fb579c4b92ce00e0ec145114e"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-save-muted.png",
+      "destination": "gui/qingfeng/icons/icon-save-muted.png",
+      "sha256": "e4cf7cdbef6a059e4f22e7dd59b582e3c4f6a867f6667f89362910cbcdf60a0b"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-save-white.png",
+      "destination": "gui/qingfeng/icons/icon-save-white.png",
+      "sha256": "d5d00ba7f834688b45be4fe1cd0b17821c4852f8c81c61093bb755632479246f"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-settings-ink.png",
+      "destination": "gui/qingfeng/icons/icon-settings-ink.png",
+      "sha256": "14637ae8fc35ee06b712da4cc5fdd255715030be5d55c108abfbaae89dd2fe1a"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-settings-muted.png",
+      "destination": "gui/qingfeng/icons/icon-settings-muted.png",
+      "sha256": "3ca4e1ddcc6b96e5a54f5e6c2c005eaef594b224cbb6f7ab268607cf25a39a26"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-settings-white.png",
+      "destination": "gui/qingfeng/icons/icon-settings-white.png",
+      "sha256": "91a7dd56e24217e80e79713c24239f5c232e1a0e8e34f3ef26ae83fa88b7ce2e"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-skip-ink.png",
+      "destination": "gui/qingfeng/icons/icon-skip-ink.png",
+      "sha256": "d35aaa68238182807514f3f06ee3bb5d12ee09530fa9ebacea0357f025b3f580"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-skip-muted.png",
+      "destination": "gui/qingfeng/icons/icon-skip-muted.png",
+      "sha256": "04e1b778038f5c70a7c6ffd9f977b68951cf281cc24da264a77266acd7e9b829"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-skip-white.png",
+      "destination": "gui/qingfeng/icons/icon-skip-white.png",
+      "sha256": "17a0d6ed3138bede112027ba18347e3b82e4228ad0c61d4951a284eb4b534ebd"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-title-ink.png",
+      "destination": "gui/qingfeng/icons/icon-title-ink.png",
+      "sha256": "eca37bccebdef93238a989bc7311f654584e60301a3fc2b411563019004c816f"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-title-muted.png",
+      "destination": "gui/qingfeng/icons/icon-title-muted.png",
+      "sha256": "5be1193ee3e7b9ebf92c4f3f915caa5bb477289272d11d20330d1ca71bf68a10"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\icon-title-white.png",
+      "destination": "gui/qingfeng/icons/icon-title-white.png",
+      "sha256": "b8b71703d1c55822d9698d300e046afa75c361732a09c5e3e1225543b624ae27"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-outline-cyan.png",
+      "destination": "gui/qingfeng/icons/leaf-outline-cyan.png",
+      "sha256": "72079ce302cdd03f45a93e57151c6e8f55393f5c412184862ef4c84b30f281aa"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-outline-green.png",
+      "destination": "gui/qingfeng/icons/leaf-outline-green.png",
+      "sha256": "93402cf3319ff4c32bc7fb8f890aed833167950be409d63bca593f860564c4a6"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-outline-ink.png",
+      "destination": "gui/qingfeng/icons/leaf-outline-ink.png",
+      "sha256": "5edeff9f3e2fe0fe83cf1543121fdc508564970676e045adaca2fb6e44ab9f24"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-outline-white.png",
+      "destination": "gui/qingfeng/icons/leaf-outline-white.png",
+      "sha256": "12f291e985cc351c897b13482f68dfd075a8378c698d9701527eb39ae47b9f60"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-solid-cyan.png",
+      "destination": "gui/qingfeng/icons/leaf-solid-cyan.png",
+      "sha256": "5abea6341ba7fc3068ac10a67d5ece40ed370193875ea7e9e601979d37922034"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-solid-green.png",
+      "destination": "gui/qingfeng/icons/leaf-solid-green.png",
+      "sha256": "f6e9b8340ca32b21a85cd5f57e3b8e58a16bb0eecafc33aab02580d4164a84c6"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-solid-ink.png",
+      "destination": "gui/qingfeng/icons/leaf-solid-ink.png",
+      "sha256": "2a42d04894a4c4546266393dc1a4829a49e931659c1bc8ca2913b307305bc62e"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\assets\\leaf-solid-white.png",
+      "destination": "gui/qingfeng/icons/leaf-solid-white.png",
+      "sha256": "412a0dec1afcea1f8e166127cec7ed3739d93164d1ac2b42fcdd2eb5544dc6f5"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-achievements-disabled.png",
+      "destination": "gui/qingfeng/menu/achievements-disabled.png",
+      "sha256": "680182a7bf678d15498668a1f824d00c3df3ec39f338d56a527cda9cfdf8f1ec"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-achievements-focus.png",
+      "destination": "gui/qingfeng/menu/achievements-focus.png",
+      "sha256": "3d925996fa90255c836b39fc4b45849a115188ee03cd40c98ccea5df66dcbe5c"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-achievements-normal.png",
+      "destination": "gui/qingfeng/menu/achievements-normal.png",
+      "sha256": "cce6aaea71f5836d379eb8a050c00709ee726ce8cc867e3510a11b2fac5ecd3a"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-achievements-pressed.png",
+      "destination": "gui/qingfeng/menu/achievements-pressed.png",
+      "sha256": "eaeb61d1304e271fb8e43a0ce0420d1f52a38c765e2229d51ba275abf075fb0c"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-load-disabled.png",
+      "destination": "gui/qingfeng/menu/load-disabled.png",
+      "sha256": "c1d3e5f696d593e72c742ba79ed34b5f14993f9f92b421f6256ff3bae6fed28f"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-load-focus.png",
+      "destination": "gui/qingfeng/menu/load-focus.png",
+      "sha256": "172a874b91745ba2de81ebd2510e51b86db8d9b0c47dcb6ec147f018b94d5b8d"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-load-normal.png",
+      "destination": "gui/qingfeng/menu/load-normal.png",
+      "sha256": "090e97034d2aa813fe94de5fbcec2ac6be9dcfd34c24313cbada5e0dc8b31923"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-load-pressed.png",
+      "destination": "gui/qingfeng/menu/load-pressed.png",
+      "sha256": "afc2dfa4ad1b1ad354699f1c4808d42f5bc944b09fee010af5dc7bfb5736da1c"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-ova-disabled.png",
+      "destination": "gui/qingfeng/menu/ova-disabled.png",
+      "sha256": "9af83753b0aeb8bbad1c2c2718aed453da2ce32d11bd87bb7762c1d76b276aa4"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-ova-focus.png",
+      "destination": "gui/qingfeng/menu/ova-focus.png",
+      "sha256": "3c3b4f4408d2c62ca231880f74df5370f763f499de1f8a5bf898b424c2e1c2f1"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-ova-normal.png",
+      "destination": "gui/qingfeng/menu/ova-normal.png",
+      "sha256": "0c353b26212fa08611b14451e2567be32e627b6108651de5e1b3ea7f751ead27"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-ova-pressed.png",
+      "destination": "gui/qingfeng/menu/ova-pressed.png",
+      "sha256": "0fd5b38f710867431ec24549fd3d72ef4debb6d7f2d19e87c8d975378e93173c"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-quit-disabled.png",
+      "destination": "gui/qingfeng/menu/quit-disabled.png",
+      "sha256": "421f7d285e87f4a82a5b21f5011e1959c94cef2384dfd2a5c06ca925e46b656e"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-quit-focus.png",
+      "destination": "gui/qingfeng/menu/quit-focus.png",
+      "sha256": "adb9ca33042c60a8939c72eba827457a634451d34f513f786b693d4719e90de5"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-quit-normal.png",
+      "destination": "gui/qingfeng/menu/quit-normal.png",
+      "sha256": "d4a8d11b96f62edf13c9fa7f7142f6ab334b1082241163630cb05ff1a8edbe4b"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-quit-pressed.png",
+      "destination": "gui/qingfeng/menu/quit-pressed.png",
+      "sha256": "637485ed2f5d5c2b462d1bbc646233f2e14f4f53177db38113207eea361c14a4"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-settings-disabled.png",
+      "destination": "gui/qingfeng/menu/settings-disabled.png",
+      "sha256": "bf16c9a13935f8e0256c4d47529d4d57a95571986c0f3d39923b63c5eb77dd96"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-settings-focus.png",
+      "destination": "gui/qingfeng/menu/settings-focus.png",
+      "sha256": "36e8c2e4bf54408a34edb6d6f2023bb68a59730df3e11bd487b507a0ddb8fb1f"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-settings-normal.png",
+      "destination": "gui/qingfeng/menu/settings-normal.png",
+      "sha256": "99d84af738b337b82bc38786de4bd6d27c225117e5e2681580cc6c5e64bb23a1"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-settings-pressed.png",
+      "destination": "gui/qingfeng/menu/settings-pressed.png",
+      "sha256": "1f67b000e1e0101dcfbea572cf372f3e209f9816aa444c7eac115666b43bb3ee"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-start-disabled.png",
+      "destination": "gui/qingfeng/menu/start-disabled.png",
+      "sha256": "9345ff9d0df2ef4e868faa67a3365b7b1258ce9909df410da3a8f4c701c0f4d1"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-start-focus.png",
+      "destination": "gui/qingfeng/menu/start-focus.png",
+      "sha256": "a8644163775bd2d4517789d3b86a72259356a4be6bfd29ec29c1aa82f5beac3e"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-start-normal.png",
+      "destination": "gui/qingfeng/menu/start-normal.png",
+      "sha256": "e64c3a0cccdbe8a5e8b88afbb1b5f101683658e1b9073fd4b78ccc0f6c0e0894"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\buttons\\B-start-pressed.png",
+      "destination": "gui/qingfeng/menu/start-pressed.png",
+      "sha256": "e285886cf3ee98a77854c8f12843ec2064732ee508c27cc51fa5f75d8de85049"
+    },
+    {
+      "source": "output\\main-visual-menu-1013\\assets\\art-logo-1920.png",
+      "destination": "gui/qingfeng/main_visual.png",
+      "sha256": "aaeaed1238a6bc3787f53b2e096f5e0a4cc5382d74935de894499af9ad349261"
+    },
+    {
+      "source": "ChironGoRoundTC-600SB.otf",
+      "destination": "fonts/qingfeng/Round-Semibold.otf",
+      "sha256": "8608bdd4d6ab43918f3cec933724939a547bef7f2a56e94ed1dc7b3509b6449d"
+    },
+    {
+      "source": "ChironGoRoundTC-500M.otf",
+      "destination": "fonts/qingfeng/Round-Medium.otf",
+      "sha256": "f7ab11d23fb7f43950e306e4856a8d71dab878963853b4608ab61919923b8b82"
+    },
+    {
+      "source": "SourceHanSansSC-Heavy-2.otf",
+      "destination": "fonts/qingfeng/SourceHanSansSC-Heavy.otf",
+      "sha256": "4a8b2ee4f041fa56c7a5561f36e13ed6780eec66161c30274fc90b0c5ba7cea2"
+    },
+    {
+      "source": "output\\ui-elements-1013-v02\\fonts\\OFL.txt",
+      "destination": "fonts/qingfeng/OFL.txt",
+      "sha256": "74ba2e8a3e010fa81dc24958b23ad2dc885638b0b2da37ae4a2299e76b6b69f7"
+    }
+  ]
+}
