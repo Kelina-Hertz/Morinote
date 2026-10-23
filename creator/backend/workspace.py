@@ -48,6 +48,12 @@ def file_tree(root):
         for path in sorted(folder.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())):
             if path.name.casefold() in HIDDEN or path.is_symlink() or path.suffix.lower() in {'.rpyc', '.pyc', '.psd'}:
                 continue
+            # Keep author files, but do not walk the colocated editor or SDK.
+            if depth == 0 and path.is_dir() and (
+                (path / 'renpy.py').is_file() and (path / 'lib').is_dir()
+                or (path / 'electron/main.cjs').is_file() and (path / 'backend/server.py').is_file()
+            ):
+                continue
             relative = path.relative_to(root).as_posix()
             if path.is_dir():
                 result.append({'name': path.name, 'path': relative, 'children': visit(path, depth+1)})
@@ -68,6 +74,10 @@ def read_overlay(root, relative, documents=None):
 
 def validate_metadata(ide):
     if not isinstance(ide,dict):raise ValueError('项目编辑配置必须为对象。')
+    for key in ('chapterEntries', 'chapterExitPoints'):
+        mapping = ide.get(key, {})
+        if not isinstance(mapping, dict) or any(not isinstance(k,str) or not k or not isinstance(v,str) or len(v)>240 for k,v in mapping.items()):
+            raise ValueError('章节入口与出口配置需为有效名称映射。')
     scene_titles=ide.get('sceneTitles',{})
     if not isinstance(scene_titles,dict) or any(not isinstance(k,str) or not isinstance(v,str) or len(v)>120 for k,v in scene_titles.items()):
         raise ValueError('剧情名称需为最多 120 字的文字。')
@@ -92,9 +102,13 @@ def validate_metadata(ide):
             visited.add(current['id']);current=by_id[current['parent']]
 
 
-def projection(root, project, documents):
+def projection(root, project, documents, ide=None):
     from .renpy_import import index_sources
-    candidate=copy.deepcopy(project)
+    # These derived trees are replaced by index_sources, never read as input.
+    candidate=copy.deepcopy({k:v for k,v in project.items() if k not in ('graphs','scenes')})
+    if ide is not None:
+        validate_metadata(ide)
+        candidate['ide']=copy.deepcopy(ide)
     contents={}
     for document in documents:
         path=document['path'];contents[path]=read_overlay(root,path,documents)['content']
@@ -102,7 +116,7 @@ def projection(root, project, documents):
             candidate['nativeRenpy']['files'].append({'projectPath':path,'gamePath':path.removeprefix('game/')})
     baseline_path=safe_path(root,project['nativeRenpy']['indexPath'])
     previous=json.loads(baseline_path.read_text('utf-8')) if baseline_path.exists() else None
-    index_sources(root,candidate,previous=previous,source_contents=contents)
+    index_sources(root,candidate,previous=previous,source_contents=contents,build_baseline=False)
     return candidate
 
 

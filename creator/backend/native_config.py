@@ -5,6 +5,7 @@ import hashlib
 import re
 from pathlib import Path
 from .workspace import read_document, read_overlay
+from .story_profile import canonical_file, preferred_files
 
 GROUPS = [
     ('phone', '手机外观与音效', 'message_system.rpy', ('phone_', 'p_', 'top_', 'title_position', 'intro_position', 'audio.phone')),
@@ -46,7 +47,7 @@ def node_span(expression, node, offset):
 def catalog(root, project, documents=None):
     groups, bindings = [], {}
     for gid, title, filename, prefixes in GROUPS:
-        files = [p for p in project['nativeRenpy']['codeFiles'] if p.endswith('/'+filename)]
+        files = [p for p in preferred_files(project['nativeRenpy']['codeFiles']) if canonical_file(p).endswith('/'+filename)]
         group = {'id':gid, 'title':title, 'fields':[], 'tables':[], 'sources':files, 'actions':[]}
         for path in files:
             doc = read_overlay(root, path, documents)

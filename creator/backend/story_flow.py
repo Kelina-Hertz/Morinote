@@ -2,7 +2,7 @@
 from __future__ import annotations
 import ast
 from pathlib import PurePosixPath
-from .story_profile import scene_info
+from .story_profile import scene_info, canonical_file
 
 
 def label_role(label, project):
@@ -16,7 +16,7 @@ def label_role(label, project):
     if custom in ('story','conversation','system','test'):return custom
     profile = scene_info(project, label)
     if profile.get('role'): return profile['role']
-    name=label['name'];path=PurePosixPath(label['file'].replace('\\','/'));base=path.name.lower()
+    name=label['name'];path=PurePosixPath(canonical_file(label['file']));base=path.name.lower()
     if 'test_script' in path.parts: return 'test'
     if name.startswith(('_ui_','_creator_')) or name in ('contact_system_demo',):return 'test'
     if name in ('splashscreen','main_menu','before_main_menu','after_load','before_load','quit','before_save','after_warp','hide_windows'):return 'system'
@@ -120,7 +120,7 @@ def project_flow(flow):
             for nxt in next_edges:
                 if nxt['kind'] == 'return':
                     continue
-                pending.append((dict(nxt, title=edge['title'], kind=edge['kind']), seen | {target['id']}))
+                pending.append((dict(nxt, title=edge['title'], kind=edge['kind'], editPoint=nxt.get('editPoint') or edge.get('editPoint')), seen | {target['id']}))
     # A single explicit "return to title" choice is one editorial ending card.
     # Keep both statements intact in the raw CFG and detailed source projection.
     lookup={n['id']:n for n in nodes};folded=set()
@@ -134,6 +134,15 @@ def project_flow(flow):
         node['terminal']=True;node['optionTitles']=[exits[0]['title']]
         folded.add(target['id'])
     nodes=[n for n in nodes if n['id'] not in folded]
+    # IDE-created branching labels are one connectable block on the canvas.
+    # Their raw statements remain available in the detailed source view.
+    compact = {n['controlNode']: n for n in nodes if n.get('blockKind') and n.get('controlNode')}
+    if compact:
+        owners = {n['id'] for n in compact.values()}
+        hidden = set(compact) | {n['id'] for n in nodes if n['type']=='return' and n['label'] in owners}
+        nodes = [n for n in nodes if n['id'] not in hidden]
+        edges = [dict(e, source=compact[e['source']]['id']) if e['source'] in compact else e
+                 for e in edges if e['target'] not in hidden and (e['source'] not in hidden or e['source'] in compact)]
     ids={n['id'] for n in nodes};groups={n['group'] for n in nodes}
     return {'nodes': nodes, 'edges': [e for e in edges if e['source'] in ids and e['target'] in ids],
             'groups': [g for g in flow['groups'] if g['id'] in groups]}

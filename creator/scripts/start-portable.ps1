@@ -1,4 +1,4 @@
-param([switch]$PrepareOnly)
+param([switch]$PrepareOnly, [switch]$PreferLocalBuild)
 $ErrorActionPreference = 'Stop'
 function Get-ArchiveHash([string]$File) {
     $stream = [IO.File]::OpenRead($File)
@@ -8,6 +8,16 @@ function Get-ArchiveHash([string]$File) {
 }
 try {
     $creatorRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+    $localElectron = Join-Path $creatorRoot 'node_modules/electron/dist/electron.exe'
+    $localRenderer = Join-Path $creatorRoot 'dist/index.html'
+    $localMain = Join-Path $creatorRoot 'electron/main.cjs'
+    $localSdk = if ($env:CREATOR_RENPY_SDK) { $env:CREATOR_RENPY_SDK } else { Join-Path $creatorRoot '../renpy-8.5.3-sdk' }
+    $localPython = Join-Path $localSdk 'lib/py3-windows-x86_64/python.exe'
+    if ($PreferLocalBuild -and -not $PrepareOnly -and (Test-Path -LiteralPath $localElectron) -and (Test-Path -LiteralPath $localRenderer) -and (Test-Path -LiteralPath $localMain) -and (Test-Path -LiteralPath $localPython)) {
+        Write-Host 'Starting the current local IDE build...'
+        Start-Process -FilePath $localElectron -ArgumentList ('"' + $creatorRoot + '"') -WorkingDirectory $creatorRoot -WindowStyle Normal
+        exit 0
+    }
     $portableRoot = Join-Path $creatorRoot 'portable'
     $manifestPath = Join-Path $portableRoot 'manifest.json'
     if (-not (Test-Path -LiteralPath $manifestPath)) {

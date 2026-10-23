@@ -13,8 +13,8 @@ contextBridge.exposeInMainWorld('creator', Object.freeze({
     const listener = async (_event, request) => {
       if (!request || typeof request.id !== 'string') return;
       try {
-        await callback();
-        ipcRenderer.send('creator:close-result', { id: request.id, ok: true });
+        const allowed = await callback();
+        ipcRenderer.send('creator:close-result', { id: request.id, ok: true, cancelled: allowed === false });
       } catch (error) {
         ipcRenderer.send('creator:close-result', { id: request.id, ok: false, error: String(error?.message || error) });
       }

@@ -7,15 +7,15 @@ export function DockScope({scope,children}:{scope:string;children:ReactNode}){
  return <DockContext.Provider value={scope}>{children}</DockContext.Provider>;
 }
 type Layout={size:number;collapsed:boolean};
-type Props={id:string;title:string;side?:'left'|'right'|'bottom';initialSize?:number;minSize?:number;children:ReactNode};
+type Props={id:string;title:string;side?:'left'|'right'|'bottom';initialSize?:number;initialCollapsed?:boolean;storageVersion?:number;minSize?:number;children:ReactNode};
 
 /** Editor-only layout, scoped to a project; no source or preview changes. */
 export default function DockPanel(props:Props){
- const scope=useDockScope(),key='creator:dock:v1:'+scope+':'+props.id;
+ const scope=useDockScope(),key='creator:dock:v'+(props.storageVersion??1)+':'+scope+':'+props.id;
  return <Panel key={key} storageKey={key} {...props}/>;
 }
-function Panel({storageKey:key,title,side='right',initialSize=260,minSize=160,children}:Props&{storageKey:string}){
- const read=():Layout=>{try{const v=JSON.parse(localStorage.getItem(key)||'null');if(v&&Number.isFinite(v.size))return {size:Math.max(minSize,Math.min(1200,v.size)),collapsed:!!v.collapsed};}catch{}return {size:initialSize,collapsed:false};};
+function Panel({storageKey:key,title,side='right',initialSize=260,initialCollapsed=false,minSize=160,children}:Props&{storageKey:string}){
+ const read=():Layout=>{try{const v=JSON.parse(localStorage.getItem(key)||'null');if(v&&Number.isFinite(v.size))return {size:Math.max(minSize,Math.min(1200,v.size)),collapsed:!!v.collapsed};}catch{}return {size:initialSize,collapsed:initialCollapsed};};
  const [layout,setLayout]=useState<Layout>(read),[dragging,setDragging]=useState(false);
  const panel=useRef<HTMLDivElement>(null),drag=useRef<{start:number;size:number;max:number}|null>(null);
  useEffect(()=>{if(!dragging)try{localStorage.setItem(key,JSON.stringify(layout));}catch{}},[key,layout,dragging]);

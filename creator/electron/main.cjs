@@ -122,7 +122,7 @@ function registerIPC() {
   });
   ipcMain.on('creator:close-result', (event, result) => {
     if (!trustedSender(event, window, loadedURL) || !closePending || result?.id !== closePending.id) return;
-    closePending.resolve(result.ok === true ? null : String(result.error || '草稿备份失败'));
+    closePending.resolve(result.cancelled === true ? false : result.ok === true ? null : String(result.error || '关闭准备失败'));
   });
   handle('creator:pickFolder', async () => {
     const result = await dialog.showOpenDialog(window, { properties: ['openDirectory', 'createDirectory'], title: '选择项目文件夹' });
@@ -169,26 +169,25 @@ async function prepareClose() {
   if (!window || window.isDestroyed() || closePending) return;
   const id = crypto.randomUUID();
   const failure = await new Promise(resolve => {
-    const timer = setTimeout(() => resolve('等待草稿备份超时；现有备份仍然保留。'), 15000);
-    closePending = { id, timer, resolve: result => { clearTimeout(timer); resolve(result); } };
+    // A save/discard prompt may stay open while the writer decides.
+    closePending = { id, resolve };
     window.webContents.send('creator:prepare-close', { id });
   });
   if (!window || window.isDestroyed() || closePending?.id !== id) return;
+  if (failure === false) { cancelClose(); return; }
   const saving = pendingSourceMutations.size > 0;
   if (!failure && !saving) {
     closePending = null; closeAllowed = true; window.close(); return;
   }
   const result = await dialog.showMessageBox(window, {
-    type: 'warning', title: saving ? '正在保存源码' : '草稿备份尚未完成',
-    message: saving ? '源码仍在保存，暂时不能关闭 IDE。' : '最近的修改尚未确认备份成功。',
-    detail: saving ? '请等待保存完成后重试，或取消关闭继续编辑。现有恢复草稿保持不变。' : `${failure || '草稿尚未备份'}\n退出会放弃最后一次成功备份之后的修改；已有草稿和历史仍保留。`,
-    buttons: saving ? ['重试', '取消关闭'] : ['重试', '取消关闭', '放弃未备份修改并退出'], defaultId: 0, cancelId: 1, noLink: true,
+    type: 'warning', title: saving ? '正在保存源码' : '无法关闭 IDE',
+    message: saving ? '源码仍在保存，暂时不能关闭 IDE。' : '关闭准备失败，修改仍保留在编辑器中。',
+    detail: saving ? '请等待保存完成后重试，或取消关闭继续编辑。' : String(failure),
+    buttons: ['重试', '取消关闭'], defaultId: 0, cancelId: 1, noLink: true,
   });
   if (!window || window.isDestroyed() || closePending?.id !== id) return;
   if (result.response === 0) { clearTimeout(closePending.timer); closePending = null; void prepareClose(); }
-  else if (result.response === 2 && !pendingSourceMutations.size) {
-    clearTimeout(closePending.timer); closePending = null; closeAllowed = true; window.close();
-  } else cancelClose();
+  else cancelClose();
 }
 
 function createWindow() {

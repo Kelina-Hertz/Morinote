@@ -34,6 +34,18 @@ class Service:
         self.lock = threading.RLock()
         self.preview = PreviewManager(self.engine, '', token, self.runtime_edit)
         self.project_session = uuid.uuid4().hex
+        self._read_cache = None
+
+    def read_snapshot(self):
+        """Read-only consumers share one descriptor parse, keyed by disk identity."""
+        root = self.current()
+        descriptor = project_file(root)
+        stat = descriptor.stat()
+        key = (str(root), stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size)
+        if self._read_cache is None or self._read_cache[0] != key:
+            project = load_project(root)
+            self._read_cache = (key, project, {a['id']: a for a in project['assets']})
+        return self._read_cache[1:]
 
     def current(self):
         if self.root is None:
@@ -54,6 +66,7 @@ class Service:
         self.preview.sequence=0
         self.root=Path(root)
         self.project_session=uuid.uuid4().hex
+        self._read_cache=None
 
     def effective(self, project, scene_id, line_id, key):
         scene = next((s for s in project['scenes'] if s['id'] == scene_id), None)
@@ -130,15 +143,15 @@ class Service:
                 return {'ok': True}
             if route.endswith('/motion-source'):
                 from backend.native_motion import actor_source
-                candidate=workspace.projection(root,project,body.get('documents',[]))
+                candidate=workspace.projection(root,project,body.get('documents',[]),ide=body.get('ide'))
                 return actor_source(root,candidate,body.get('nodeId'),body.get('tag'),body.get('documents'))
             if route.endswith('/analyze'):
-                candidate=workspace.projection(root,project,body.get('documents',[]))
+                candidate=workspace.projection(root,project,body.get('documents',[]),ide=body.get('ide'))
                 return {'config':native_config.catalog(root,candidate,body.get('documents')), 'flow':native_flow.graph(root,candidate,body.get('documents')), 'project':candidate}
             if route.endswith('/prepare'):
                 adapter = {'config':native_config, 'flow':native_flow, 'stage':native_stage, 'assets':native_assets}.get(body['adapter'])
                 if not adapter:raise ValueError('未知原生编辑器。')
-                candidate=workspace.projection(root,project,body.get('documents',[]))
+                candidate=workspace.projection(root,project,body.get('documents',[]),ide=body.get('ide'))
                 return adapter.edit(root,candidate,{**body['operation'],'documents':body.get('documents',[])})
             if route.endswith('/save'):
                 result = workspace.commit(root, body['edits'], body['revision'], engine=self.engine, strict=body.get('strict', False))
@@ -378,16 +391,18 @@ def create_server(service, port):
         def log_message(self, *_):
             pass
 
-        def send(self, value, status=200, mime='application/json; charset=utf-8', cookie=False):
-            try:self.write_response(value,status,mime,cookie)
+        def send(self, value, status=200, mime='application/json; charset=utf-8', cookie=False, headers=None):
+            try:self.write_response(value,status,mime,cookie,headers)
             except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError):pass
 
-        def write_response(self, value, status=200, mime='application/json; charset=utf-8', cookie=False):
+        def write_response(self, value, status=200, mime='application/json; charset=utf-8', cookie=False, headers=None):
             content = value if isinstance(value, bytes) else json.dumps(value, ensure_ascii=False, default=str).encode('utf-8')
             self.send_response(status)
             self.send_header('Content-Type', mime)
             self.send_header('Content-Length', str(len(content)))
-            self.send_header('Cache-Control', 'no-store')
+            self.send_header('Cache-Control', (headers or {}).get('Cache-Control', 'no-store'))
+            for key, value in (headers or {}).items():
+                if key != 'Cache-Control': self.send_header(key, value)
             self.send_header('X-Content-Type-Options', 'nosniff')
             if mime.startswith('image/svg'):
                 self.send_header('Content-Security-Policy', "sandbox; default-src 'none'; style-src 'unsafe-inline'")
@@ -428,10 +443,48 @@ def create_server(service, port):
             return 'creator_session' in cookie and secrets.compare_digest(cookie['creator_session'].value, service.token)
 
         def do_GET(self):
+            if urlsplit(self.path).path == '/api/media':
+                return self.read_media()
             if urlsplit(self.path).path=='/bridge/poll':return self.read_request()
             # Scope check and resource lookup must observe the same project.
             with service.lock:
                 self.read_request()
+
+        def read_media(self):
+            if not self.trusted():
+                return self.send({'error': '未授权的本机请求。'}, 401)
+            try:
+                query = parse_qs(urlsplit(self.path).query)
+                with service.lock:
+                    service.check_session(query.get('projectSession', [None])[0])
+                    session, root = service.project_session, service.current()
+                    project, assets = service.read_snapshot()
+                    asset = assets.get(query.get('id', [''])[0])
+                    if asset and asset.get('virtual'): asset = assets.get(asset.get('mediaAssetId'))
+                    if not asset or not asset.get('path') or asset['path'].startswith('builtin:'):
+                        return self.send({'error': '无可读取的素材文件。'}, 404)
+                    path = safe_path(root, asset['path'])
+                    version = query.get('version', [None])[0]
+                    if version and version != str(project['revision']):
+                        return self.send({'error': '素材版本已变化，请刷新。'}, 409)
+                    if path.suffix.lower() not in MEDIA: raise ValueError('不支持的媒体类型。')
+                # Image decoding, disk IO and sending bytes never hold the edit lock.
+                stat = path.stat()
+                stamp = (stat.st_mtime_ns, stat.st_ctime_ns, stat.st_size)
+                size = min(512, max(64, int(query.get('thumbnail', ['0'])[0]))) if 'thumbnail' in query else 0
+                etag = '"' + hashlib.sha256((session + str(path) + repr(stamp) + str(size)).encode()).hexdigest() + '"'
+                headers = {'Cache-Control': 'private, max-age=0, must-revalidate', 'ETag': etag}
+                if self.headers.get('If-None-Match') == etag:
+                    return self.send(b'', 304, headers=headers)
+                if size:
+                    from backend.media_cache import thumbnail
+                    path = thumbnail(path, safe_path(root, '.creator/editor/cache/thumbnails'), size, stamp)
+                data = path.read_bytes()
+                with service.lock:
+                    service.check_session(session)
+                return self.send(data, mime=mimetypes.guess_type(path.name)[0] or 'application/octet-stream', headers=headers)
+            except (ValueError, KeyError, TypeError, OSError) as error:
+                self.send({'error': str(error)}, 400)
 
         def read_request(self):
             route = urlsplit(self.path)
@@ -472,26 +525,10 @@ def create_server(service, port):
                     return self.send({'content': path.read_text(encoding='utf-8') if path.exists() else ''})
                 if route.path == '/api/preview/status':
                     status=service.preview.status(int(query.get('after', [0])[0]))
-                    if service.root:status['projectRevision']=load_project(service.root)['revision']
+                    if service.root:status['projectRevision']=service.read_snapshot()[0]['revision']
                     return self.send(status)
                 if route.path == '/bridge/poll':
                     return self.send(service.preview.poll(query.get('session', [''])[0], int(query.get('after',[0])[0])))
-                if route.path == '/api/media':
-                    project = load_project(service.current())
-                    aid = query.get('id', [''])[0]
-                    asset = next((a for a in project['assets'] if a['id'] == aid), None)
-                    if asset and asset.get('virtual'):
-                        media_id = asset.get('mediaAssetId')
-                        asset = next((a for a in project['assets'] if not a.get('virtual') and a['id'] == media_id), None)
-                    if not asset or not asset.get('path') or asset['path'].startswith('builtin:'):
-                        return self.send({'error': '无可读取的素材文件。'}, 404)
-                    path = safe_path(service.current(), asset['path'])
-                    version = query.get('version',[None])[0]
-                    if version and version != str(project['revision']):
-                        return self.send({'error':'素材版本已变化，请刷新。'},409)
-                    if path.suffix.lower() not in MEDIA:
-                        raise ValueError('不支持的媒体类型。')
-                    return self.send(path.read_bytes(), mime=mimetypes.guess_type(path.name)[0] or 'application/octet-stream')
                 if service.ui and not route.path.startswith(('/api/', '/bridge/')):
                     relative = route.path.lstrip('/') or 'index.html'
                     path = (service.ui / relative).resolve()

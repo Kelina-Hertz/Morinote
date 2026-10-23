@@ -1,0 +1,59 @@
+.native-global-flow .flow-inspector{background:#151d27;color:#dce6ee;border-left:1px solid #2b3542;scrollbar-width:thin;scrollbar-color:#394656 transparent}
+.flow-inspector>.panel-heading{min-height:54px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:16px 18px 16px 27px;border-bottom:1px solid #2b3542;font-size:12px;font-weight:600;letter-spacing:.03em}
+.flow-inspector>.panel-heading small{font-size:10px;color:#7f91a3;font-weight:400;letter-spacing:0}
+.native-document .flow-inspector>.inspector-body{padding:20px 16px;gap:20px}
+.flow-inspector-identity{display:flex;align-items:center;gap:12px;min-width:0}
+.flow-kind-icon{width:40px;height:40px;border:1px solid #3c5757;background:#233b3b;color:#a7dfce;border-radius:11px;display:grid;place-items:center;flex-shrink:0}
+.flow-kind-icon.choice{background:#302c44;border-color:#4e4566;color:#c2b2ef}
+.flow-kind-icon.condition{background:#3a3227;border-color:#5f5038;color:#e2c18c}
+.flow-inspector-identity>div{min-width:0}
+.flow-kind-label{font-size:10px;color:#94a5b6;display:block;margin-bottom:5px}
+.flow-inspector-identity h2{font-size:16px;line-height:1.45;font-weight:600;margin:0;color:#edf3f8;overflow-wrap:anywhere}
+.flow-inspector-section{display:flex;flex-direction:column;gap:12px;min-width:0}
+.native-document .flow-inspector label{font-size:11px;color:#9eafbf;gap:7px}
+.native-document .flow-inspector input:not([type=checkbox]),.native-document .flow-inspector select{background:#101823;border:1px solid #344151;border-radius:7px;padding:10px 11px;font-size:12px;line-height:1.5;color:#e2eaf1;transition:border-color .15s,background .15s}
+.native-document .flow-inspector input:hover,.native-document .flow-inspector select:hover{border-color:#536577}
+.native-document .flow-inspector input:focus,.native-document .flow-inspector select:focus{border-color:#9bcaba;background:#15232c}
+.flow-field-icon{position:relative;display:flex;align-items:center}
+.flow-field-icon>svg{position:absolute;left:11px;color:#8297aa;pointer-events:none}
+.native-document .flow-inspector .flow-field-icon input{padding-left:33px}
+.flow-inspector button{cursor:pointer}
+.native-ide .flow-inspector button:not(.dock-toggle){border:1px solid #354354;border-radius:7px;background:#202c39;color:#d4dfe9;padding:10px 12px;font-size:12px;line-height:1.4;min-height:37px;text-align:left;justify-content:flex-start;transition:background .15s,border-color .15s}
+.native-ide .flow-inspector button:hover:not(:disabled){background:#2b3b4a;border-color:#597184}
+.native-ide .flow-inspector button:disabled{opacity:.4;cursor:not-allowed}
+.flow-primary-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:2px}
+.native-ide .flow-inspector .flow-primary-actions button{justify-content:center;padding:10px 6px;gap:6px;white-space:nowrap}
+.native-ide .flow-inspector button.flow-edit-scene{background:#a5d7c7;color:#142e2b;border-color:#a5d7c7;font-weight:600}
+.native-ide .flow-inspector button.flow-edit-scene:hover{background:#bde7da;border-color:#bde7da}
+.flow-section-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.flow-section-heading h3{font-size:12px;font-weight:600;color:#dce6ee;margin:0;line-height:1.5}
+.flow-section-heading>span{font-size:10px;color:#8c9fb1}
+.flow-inspector .flow-authoring-actions{border-top:1px solid #2b3745;border-bottom:0;padding:18px 0 0;gap:12px}
+.flow-action-stack{display:flex;flex-direction:column;gap:8px}
+.flow-action-stack:empty{display:none}
+.flow-destination-list{display:flex;flex-direction:column;gap:7px}
+.native-ide .flow-inspector button.flow-destination{display:flex;align-items:center;gap:9px;width:100%;padding:11px 10px;background:#192430;border-color:#303f50}
+.flow-outlet-index{width:23px;height:23px;border-radius:6px;background:#34404f;color:#b9c9d8;display:grid;place-items:center;font-size:10px;flex-shrink:0;font-variant-numeric:tabular-nums}
+.flow-destination-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:5px}
+.flow-inspector .flow-destination-copy strong{font-size:12px;font-weight:500;line-height:1.5;color:#e1e9f0;overflow-wrap:anywhere}
+.flow-destination-copy small{font-size:10px;line-height:1.5;color:#95bfb3;overflow-wrap:anywhere}
+.flow-destination>svg{flex-shrink:0;color:#8ca6b8}
+.flow-destination.is-unconnected .flow-destination-copy small{color:#8c9ba9}
+.native-ide .flow-inspector button.flow-add-outlet{justify-content:center;border-style:dashed;background:transparent;color:#b3c6d5}
+.flow-inspector-note{font-size:11px;line-height:1.8;color:#8c9faf;margin:0;overflow-wrap:anywhere}
+.flow-inspector-status{font-size:10px;line-height:1.5;color:#e0c392;background:#372e23;border:1px solid #594b35;padding:7px 10px;border-radius:6px;margin:-6px 0 0}
+.flow-inspector .flow-reference{padding:8px 10px;margin:0;background:#192430;border:0;border-radius:6px;color:#a8bdcd;font-size:11px;line-height:1.7;overflow-wrap:anywhere}
+.flow-inspector-advanced{border-top:1px solid #2b3745;padding-top:15px}
+.flow-inspector-advanced>summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;color:#8fa2b3;font-size:11px;padding:5px 0}
+.flow-inspector-advanced>summary::-webkit-details-marker{display:none}
+.flow-inspector-advanced>summary>span{flex:1}
+.flow-inspector-advanced>summary>svg:last-child{transition:transform .15s}
+.flow-inspector-advanced[open]>summary>svg:last-child{transform:rotate(180deg)}
+.flow-source-details{display:flex;flex-direction:column;gap:12px;padding-top:15px}
+.flow-source-details code{color:#9caec0;font:10px/1.8 Consolas,monospace;overflow-wrap:anywhere;white-space:normal;user-select:text}
+.flow-inspector .flow-call-summary{display:flex;flex-direction:column;gap:7px;padding:10px;border:1px solid #303f50;border-radius:7px}
+.flow-inspector .flow-call-summary small{font-size:10px;line-height:1.6;color:#8c9faf;overflow-wrap:anywhere}
+.flow-inspector-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;min-height:260px;padding:32px 20px;color:#60788e;text-align:center}
+.flow-inspector-empty strong{font-size:13px;font-weight:500;color:#b5c5d2}
+.flow-inspector-empty p{font-size:11px;line-height:1.9;color:#8398aa;margin:0}
+@media(prefers-reduced-motion:reduce){.flow-inspector *{transition:none!important}}

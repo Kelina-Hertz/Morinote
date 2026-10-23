@@ -2,21 +2,30 @@
 from __future__ import annotations
 import hashlib
 import re
+import uuid
+from pathlib import Path
 from .workspace import read_document, read_overlay
+from .flow_authoring import label_path, uncomment
 
 
 def graph(root, project, sources=None, *, presentation_labels=None):
     from .story_flow import label_role, narrative_detail
-    from .story_profile import scene_info, numbered_copies
+    from .story_profile import scene_info, numbered_copies, preferred_labels, canonical_file
     labels=project['nativeRenpy']['labels'] if presentation_labels is None else presentation_labels
     nodes=[]; edges=[]; groups={}; returns={}; calls=[]; name_ids={}
-    for label in labels: name_ids.setdefault(label['name'],[]).append(label['id'])
+    visible_ids={label['id'] for label in labels}
+    for label in preferred_labels(project):
+        if label['id'] in visible_ids: name_ids.setdefault(label['name'],[]).append(label['id'])
     def target(name):
         matches=name_ids.get(name,[])
         return matches[0] if len(matches)==1 else None
     def group(label):
-        custom=project.get('ide',{}).get('flowGroups',{}).get(label['name'])
+        overrides=project.get('ide',{}).get('flowGroups',{})
+        custom=overrides.get(label['id']) or overrides.get(label['name'])
+        if not custom:
+            custom=next((overrides[l['id']] for l in project['nativeRenpy']['labels'] if l['name']==label['name'] and canonical_file(l['file'])==canonical_file(label['file']) and overrides.get(l['id'])),None)
         if custom: return custom
+        if label.get('displayGroup'): return label['displayGroup']
         preset=scene_info(project,label)
         if preset.get('group'): return preset['group']
         m=re.match(r'C(\d+)',label['name'],re.I)
@@ -28,7 +37,7 @@ def graph(root, project, sources=None, *, presentation_labels=None):
     for path in project['nativeRenpy']['codeFiles']:
         if path.endswith('.rpy'): documents[path]=read_overlay(root,path,sources)
     for li,label in enumerate(labels):
-        path=next((p for p in documents if p.endswith('/'+label['file'])),None)
+        path=label_path(project,label,documents)
         if not path: continue
         doc=documents[path]; rows=doc['content'].splitlines(keepends=True)
         offsets=[0]
@@ -37,7 +46,7 @@ def graph(root, project, sources=None, *, presentation_labels=None):
         end=next((j for j in range(label['line'],len(rows)) if rows[j].strip() and not rows[j][0].isspace() and not rows[j].lstrip().startswith('#')),len(rows))
         items=[]; skip=None; triple=None
         for j in range(label['line'],end):
-            raw=rows[j].rstrip('\r\n'); stripped=raw.strip(); indent=len(raw)-len(raw.lstrip())
+            raw=rows[j].rstrip('\r\n'); stripped=uncomment(raw)[0].strip(); indent=len(raw)-len(raw.lstrip())
             if triple:
                 if raw.count(triple)%2: triple=None
                 continue
@@ -116,7 +125,7 @@ def graph(root, project, sources=None, *, presentation_labels=None):
                         edge(nid,nxt,'continuation','返回后继续');calls.append((nid,name,nxt))
                     nxt=nid
                 elif text=='return' or text.startswith('return '):
-                    nid=make(item,'return');returns.setdefault(label['name'],[]).append(nid);nxt=nid
+                    nid=make(item,'return');returns.setdefault(label['id'],[]).append(nid);nxt=nid
             return nxt
         following=next((l['id'] for l in labels[li+1:] if l['file']==label['file']),None)
         head=block(0,len(items),min((i['indent'] for i in items),default=4),following)
@@ -125,17 +134,19 @@ def graph(root, project, sources=None, *, presentation_labels=None):
             'source':{'path':path,'line':j+1,'start':offsets[j],'end':offsets[j]+len(rows[j].rstrip('\r\n')),'hash':doc['hash']}})
         edge(label['id'],head)
     for call,name,continuation in calls:
-        for ret in returns.get(name,[]): edge(ret,continuation,'return','返回',callSite=call)
+        for ret in returns.get(target(name),[]): edge(ret,continuation,'return','返回',callSite=call)
     result={'nodes':nodes,'edges':edges,'groups':list(groups.values())}
+    from .flow_authoring import catalog
+    result['authoring']=catalog(root,project,result,sources)
     from .story_flow import project_flow
     result['story']=project_flow(result)
     result['storyDetail']=narrative_detail(result)
     if presentation_labels is None:
         copies=numbered_copies(project)
         if copies:
-            # Runtime ambiguity remains in the raw CFG. Only the editorial view
-            # uses the unnumbered originals; copies remain accessible as source.
-            preferred=[label for label in labels if label['file'].replace('\\','/') not in copies]
+            # The story view, static targets and authoring use the same numbered
+            # default. Other declarations remain accessible in source details.
+            preferred=preferred_labels(project)
             display=graph(root,project,sources,presentation_labels=preferred)
             result['story'],result['storyDetail']=display['story'],display['storyDetail']
             result['sourceCopies']=[{'path':'game/'+copy,'original':'game/'+original} for copy,original in sorted(copies.items())]
@@ -143,11 +154,35 @@ def graph(root, project, sources=None, *, presentation_labels=None):
 
 
 def edit(root, project, operation):
+    if operation.get('operation') in ('connect_exit','insert_after','branch_exit','create_block','disconnect_exits','end_exits','update_condition','rename_option','insert_existing'):
+        from .flow_authoring import prepare
+        return prepare(root,project,operation)
     if operation.get('operation')=='scene':
-        path=operation['path'];doc=read_overlay(root,path,operation.get("documents"));name=operation['name']
-        if not re.fullmatch(r'[A-Za-z_]\w*',name) or any(l['name']==name for l in project['nativeRenpy']['labels']):
+        from .scene_metadata import scene_comment
+        path=operation.get('path','game/creator_scenes.rpy')
+        if not isinstance(path,str): raise ValueError('源码文件需位于 game/ 内，并以 .rpy 结尾。')
+        path=path.replace('\\','/')
+        if not path.startswith('game/') or any(p in ('','..','.') for p in path.split('/')) or not path.endswith('.rpy'):
+            raise ValueError('源码文件需位于 game/ 内，并以 .rpy 结尾。')
+        doc=read_overlay(root,path,operation.get('documents'))
+        if operation.get('hash') is not None and operation['hash'] != doc['hash']:
+            raise ValueError('流程源码已有修改。')
+        names={label['name'] for label in project['nativeRenpy']['labels']}
+        # Include newly added disk files and every unsaved source document.
+        from .renpy_import import OMIT_DIRS
+        paths={p.relative_to(root).as_posix() for p in (Path(root)/'game').rglob('*.rpy') if not any(part in OMIT_DIRS for part in p.relative_to(root).parts)}
+        paths.update(d['path'] for d in operation.get('documents',[]) if d['path'].endswith('.rpy'))
+        for source in paths:
+            names.update(re.findall(r'^label\s+([\w.]+)\s*(?:\([^\n]*\))?\s*:',read_overlay(root,source,operation.get('documents'))['content'],re.M))
+        name=operation.get('name')
+        if name is None:
+            name='scene_'+uuid.uuid4().hex[:12]
+            while name in names: name='scene_'+uuid.uuid4().hex[:12]
+        if not isinstance(name,str) or not re.fullmatch(r'[A-Za-z_]\w*',name) or name in names:
             raise ValueError('标签名称无效或已存在。')
-        return {'path':path,'hash':operation['hash'],'content':doc['content']+'\n\nlabel '+name+':\n    "新场景"\n    return\n'}
+        comment=scene_comment(operation['title'],operation.get('group','剧情'),operation.get('blockKind'))+'\n' if 'title' in operation else ''
+        from .flow_authoring import PENDING_OUTLET
+        return {'path':path,'hash':doc['hash'],'content':doc['content']+'\n\n'+comment+'label '+name+':\n    "新场景"\n    return'+PENDING_OUTLET+'\n'}
     node=next((n for n in graph(root,project,operation.get('documents'))['nodes'] if n['id']==operation.get('node')),None)
     if not node: raise ValueError('流程节点已变化，请刷新。')
     src=node['source'];doc=read_overlay(root,src['path'],operation.get('documents'))
@@ -163,8 +198,13 @@ def edit(root, project, operation):
     if kind in ('choice','condition'):
         indent=' '*(len(raw)-len(raw.lstrip())+(4 if node['type']=='scene' else 0))
         if kind=='choice':
-            options=operation['options']
-            if not options or not all(any(l['name']==o['target'] for l in project['nativeRenpy']['labels']) for o in options): raise ValueError('请配置有效选项目标。')
+            options=operation.get('options')
+            if not isinstance(options,list) or not options: raise ValueError('请至少填写一个选项。')
+            for i, option in enumerate(options,1):
+                if not isinstance(option,dict) or not isinstance(option.get('text'),str) or not option['text'].strip():
+                    raise ValueError(f'第 {i} 个选项的文字不能为空。')
+                if not isinstance(option.get('target'),str) or len([l for l in project['nativeRenpy']['labels'] if l['name']==option['target']]) != 1:
+                    raise ValueError(f'第 {i} 个选项请选择存在且标签唯一的目标场景。')
             addition=indent+'menu:\n'+''.join(indent+'    '+repr(o['text'])+':\n'+indent+'        jump '+o['target']+'\n' for o in options)
         else:
             condition=operation['condition']

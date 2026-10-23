@@ -5,6 +5,7 @@ Only literal resources and numeric constants are evaluated here.
 """
 from __future__ import annotations
 import ast
+from .source_literals import literal_eval
 import copy
 import hashlib
 import math
@@ -18,7 +19,7 @@ def literal(value, constants):
     if value in constants:
         return constants[value]
     try:
-        result = ast.literal_eval(value)
+        result = literal_eval(value)
         if isinstance(result, (str, int, float, tuple, bool)):
             return result
     except (ValueError, SyntaxError):

@@ -5,6 +5,8 @@ control flow, Python, ATL, screens and character callbacks continue to run.
 """
 from __future__ import annotations
 import ast
+from .source_literals import literal_eval
+from collections import Counter
 import copy
 import difflib
 import hashlib
@@ -17,6 +19,8 @@ import uuid
 
 from .demo import make_project
 from .project import atomic_json, safe_path, project_file, EDITOR_PROJECT
+from .scene_metadata import display_hints
+from .story_profile import preferred_labels, canonical_file
 
 IMAGE = {'.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif', '.svg'}
 AUDIO = {'.ogg', '.mp3', '.wav', '.opus', '.flac'}
@@ -43,7 +47,7 @@ def game_directory(source):
     return source, game
 
 
-def index_sources(root, document, previous=None, source_contents=None):
+def index_sources(root, document, previous=None, source_contents=None, *, build_baseline=True):
     """Create conservative, source-linked text/label/edge and opaque-code indexes."""
     root = Path(root)
     native = document['nativeRenpy']
@@ -52,7 +56,7 @@ def index_sources(root, document, previous=None, source_contents=None):
     chat_aliases = set()
     character_sources={}
     auto_defaults={'afmTime':15.0,'bonus':25.0,'characters':250.0}
-    for item in native['files']:
+    for item in sorted(native['files'], key=lambda item: item['gamePath'].rsplit('.', 1)[0]):
         if not item['gamePath'].endswith('.rpy'):
             continue
         path = safe_path(root, item['projectPath'])
@@ -66,7 +70,7 @@ def index_sources(root, document, previous=None, source_contents=None):
             if re.search(r'kind\s*=\s*nvl\b',role[2]):chat_aliases.add(role[1])
         for match in re.finditer(r'(?m)^\s*define\s+(\w+)\s*=\s*Character\(\s*(' + TOKEN + ')', text):
             try:
-                characters[match[1]] = ast.literal_eval(match[2])
+                characters[match[1]] = literal_eval(match[2])
                 character_sources[match[1]]={'path':item['projectPath'],'line':text[:match.start()].count('\n')+1}
             except (SyntaxError, ValueError):
                 pass
@@ -75,7 +79,17 @@ def index_sources(root, document, previous=None, source_contents=None):
             character_sources[match[1]]={'path':item['projectPath'],'line':text[:match.start()].count('\n')+1}
             chat_aliases.discard(match[1])
     old_ids = {}
+    declarations = Counter()
+    for _, text in scripts:
+        base = ''
+        for row in text.splitlines():
+            match = LABEL.match(row)
+            if match:
+                name = base+match[1] if match[1].startswith('.') else match[1]
+                if not match[1].startswith('.'): base = name
+                declarations[name] += 1
     graphs, scenes, labels, edges, opaque, line_records = [], [], [], [], [], {}
+    global_states = {}
     known_resources = {item['gamePath'] for item in native['files']}
     resource_hints = []
     for item, text in scripts:
@@ -87,7 +101,7 @@ def index_sources(root, document, previous=None, source_contents=None):
         skip_indent = None
         triple = None
         phone_title = '手机聊天'
-        phone_mode = game_path == 'message.rpy'
+        phone_mode = canonical_file(game_path) == 'message.rpy'
         source_rows=text.splitlines(keepends=True)
         for number, raw in enumerate(source_rows, 1):
             body = raw.rstrip('\r\n')
@@ -102,6 +116,17 @@ def index_sources(root, document, previous=None, source_contents=None):
                 triple = triples[0]
                 if current: opaque.append({'file': game_path, 'line': number, 'kind': 'multiline', 'label': current['name']})
                 continue
+            state = re.match(r'^default\s+((?:persistent\.)?[A-Za-z_]\w*)\s*=\s*(.*)', body)
+            if state:
+                try:
+                    initial = literal_eval(state[2])
+                    state_type = 'boolean' if type(initial) is bool else 'number' if type(initial) in (int, float) else 'string' if isinstance(initial, str) else 'unknown'
+                except (SyntaxError, ValueError):
+                    state_type = 'unknown'
+                name = state[1]
+                if name in global_states and global_states[name]['type'] != state_type:
+                    state_type = 'unknown'
+                global_states[name] = {'name': name, 'type': state_type}
             match = LABEL.match(body)
             if match:
                 name = match[1]
@@ -111,11 +136,14 @@ def index_sources(root, document, previous=None, source_contents=None):
                     local_base = name
                 sid = ident('label_', game_path + ':' + name)
                 prior=[s for s in (previous or {}).get('scenes',[]) if s.get('title')==name]
-                if len(prior)==1:sid=prior[0]['id']
+                # A newly discovered copy must not inherit another file's ID.
+                if len(prior)==1 and (declarations[name]==1 or prior[0]['id']==sid):sid=prior[0]['id']
                 current = {'id': sid, 'name': name, 'graph': gid, 'file': game_path,
                            'line': number, 'parameters': match[2] or '', 'callable': match[2] in (None, '()')}
+                if number > 1:
+                    current.update(display_hints(source_rows[number - 2].rstrip('\r\n')))
                 labels.append(current)
-                phone_mode = game_path == 'message.rpy'
+                phone_mode = canonical_file(game_path) == 'message.rpy'
                 scenes.append({'id': sid, 'title': name, 'lines': [], 'nativeLabel': name})
                 graph['nodes'].append({'id': sid, 'type': 'scene', 'title': name, 'scene': sid})
                 graph['entry'] = graph['entry'] or sid
@@ -129,7 +157,7 @@ def index_sources(root, document, previous=None, source_contents=None):
             phone = re.match(r'show screen qq_\w+\(\s*(' + TOKEN + ')',stripped)
             if phone:
                 phone_mode = True
-                try:phone_title=ast.literal_eval(phone[1])
+                try:phone_title=literal_eval(phone[1])
                 except (SyntaxError,ValueError):pass
             mode=re.match(r'\$\s*nvl_mode\s*=\s*(.*)',stripped)
             if mode: phone_mode=mode[1].strip().strip('"\'')=='phone'
@@ -157,7 +185,7 @@ def index_sources(root, document, previous=None, source_contents=None):
                     opaque.append({'file': game_path, 'line': number, 'kind': 'custom-say', 'label': current['name']})
                     continue
                 try:
-                    value = ast.literal_eval(match['token'])
+                    value = literal_eval(match['token'])
                 except (SyntaxError, ValueError):
                     continue
                 current_scene = next(s for s in reversed(scenes) if s['id'] == current['id'])
@@ -190,7 +218,7 @@ def index_sources(root, document, previous=None, source_contents=None):
             if say and (not say['who'].strip() or say['who'].strip() in characters):continue
             for token in re.findall(TOKEN, raw):
                 try:
-                    value = ast.literal_eval(token)
+                    value = literal_eval(token)
                 except (SyntaxError, ValueError):
                     continue
                 if not isinstance(value, str) or Path(value).suffix.lower() not in IMAGE | AUDIO or any(c in value for c in '[{'):
@@ -199,20 +227,22 @@ def index_sources(root, document, previous=None, source_contents=None):
                     hard=image_context or bool(re.match(r'(?:image|scene|show|play|voice|add)\b|(?:define|default)\s+(?:audio\.|phone_|config\.)',raw.lstrip()))
                     resource_hints.append({'file': game_path, 'line': number, 'path': value,'required':hard})
     by_name = {}
-    for label in labels:
+    selected_labels = preferred_labels({'nativeRenpy': {'labels': labels}})
+    for label in selected_labels:
         by_name.setdefault(label['name'], []).append(label['id'])
     for edge in edges:
         matches = by_name.get(edge['targetLabel'], [])
         edge['target'] = matches[0] if len(matches) == 1 and not edge['dynamic'] else None
     if not graphs:
         raise ValueError('源工程没有可索引的 label；源码保留导入需要至少一个剧情标签。')
-    entry = next((label for label in labels if label['name'] == 'start'), labels[0])
+    entry = next((label for label in selected_labels if label['name'] == 'start'), selected_labels[0])
     next(graph for graph in graphs if graph['id'] == entry['graph'])['entry'] = entry['id']
     document.update(graphs=graphs, scenes=scenes, entryGraph=entry['graph'])
-    native.update(labels=labels, edges=edges, opaque=opaque,
+    native.update(labels=labels, edges=edges, opaque=opaque, globalStates=list(global_states.values()),
                   autoDefaults=auto_defaults,
                   characters=[{'alias':alias,'name':name,'kind':'chat' if alias in chat_aliases or alias=='nvl_narrator' else 'dialogue','source':character_sources.get(alias)} for alias,name in characters.items()],
-                  codeFiles=[i['projectPath'] for i in native['files'] if i['gamePath'].endswith(('.rpy', '.py'))], unresolvedResources=resource_hints)
+                  codeFiles=[i['projectPath'] for i in sorted(native['files'], key=lambda item: item['gamePath'].rsplit('.', 1)[0]) if i['gamePath'].endswith(('.rpy', '.py'))], unresolvedResources=resource_hints)
+    native['preferredLabelIds'] = [label['id'] for label in selected_labels]
     if native.get('inPlace') and not any(i['gamePath'].endswith('.rpa') for i in native['files']):
         for hint in resource_hints:
             if not hint.get('required'):continue
@@ -242,6 +272,8 @@ def index_sources(root, document, previous=None, source_contents=None):
         for line,new,record in records: line['id']=new;line_records[new]=record
     from .native_tracks import project_tracks
     project_tracks(document, scripts, line_records)
+    if not build_baseline:
+        return None
     baseline = {'graphs': copy.deepcopy(graphs), 'scenes': copy.deepcopy(scenes), 'lines': line_records,
                 'variables': copy.deepcopy(document['variables']), 'events': copy.deepcopy(document['events']),
                 'components': copy.deepcopy(document['components']), 'entryGraph': document['entryGraph']}
@@ -488,7 +520,7 @@ def generate_native(root, output, document, entry=None, preview=False):
         placeholder_map[asset['nativeGamePath']]='_creator_placeholder_'+asset['id'] if asset['kind']!='audio' else '_creator_placeholders/'+asset['id']+'.wav'
     if placeholder_map:
         def substitute(match):
-            try:value=ast.literal_eval(match[0])
+            try:value=literal_eval(match[0])
             except (ValueError,SyntaxError):return match[0]
             return repr(placeholder_map[value]) if value in placeholder_map else match[0]
         baseline=checked_projection(root,document)

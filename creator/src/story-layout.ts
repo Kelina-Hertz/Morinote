@@ -1,7 +1,8 @@
 import type {NativeFlow} from './native-types';
 
 /** Directed ranks; DFS back edges remain visible but do not inflate ranks. */
-export function storyLayout(flow:NativeFlow,group:string){
+export type LayoutDirection='vertical'|'horizontal';
+export function storyLayout(flow:NativeFlow,group:string,options:{direction?:LayoutDirection;sizes?:Record<string,{width:number;height:number}>}={}){
  const nodes=flow.nodes.filter(n=>n.group===group).sort((a,b)=>a.source.path.localeCompare(b.source.path)||a.source.line-b.source.line),ids=new Set(nodes.map(n=>n.id));
  const links=flow.edges.filter(e=>ids.has(e.source)&&ids.has(e.target)&&!['return','continuation','call'].includes(e.kind));
  const state=new Map<string,number>(),backs=new Set<string>();
@@ -11,8 +12,26 @@ export function storyLayout(flow:NativeFlow,group:string){
  const queue=nodes.filter(n=>indegree.get(n.id)===0).map(n=>n.id);
  for(let i=0;i<queue.length;i++){const id=queue[i];for(const e of forward.filter(e=>e.source===id)){rank.set(e.target,Math.max(rank.get(e.target)!,rank.get(id)!+1));indegree.set(e.target,indegree.get(e.target)!-1);if(indegree.get(e.target)===0)queue.push(e.target);}}
  const rows=new Map<number,string[]>();for(const n of nodes){const r=rank.get(n.id)!;rows.set(r,[...(rows.get(r)||[]),n.id]);}
- const width=Math.max(1,...[...rows.values()].map(r=>r.length))*330+48;
+ const size=(id:string)=>options.sizes?.[id]||{width:282,height:nodes.find(n=>n.id===id)?.optionPoints?.length?180+nodes.find(n=>n.id===id)!.optionPoints!.length*42:180};
+ const ordered=[...rows].sort(([a],[b])=>a-b);
  const positions:Record<string,{x:number;y:number}>={};
- for(const [r,row] of rows)row.forEach((id,i)=>{positions[id]={x:24+(width-48-row.length*330)/2+i*330,y:66+r*170};});
- return {positions,width,height:Math.max(230,(Math.max(0,...rows.keys())+1)*170+80),backs};
+ if(options.direction==='horizontal'){
+  const height=Math.max(230,...ordered.map(([,row])=>row.reduce((sum,id)=>sum+size(id).height+55,0)+100));
+  let x=24;
+  for(const [,row] of ordered){
+   let y=66;
+   for(const id of row){positions[id]={x,y};y+=size(id).height+55;}
+   x+=Math.max(282,...row.map(id=>size(id).width))+80;
+  }
+  return {positions,width:Math.max(378,x+24),height,backs};
+ }
+ const width=Math.max(330,...ordered.map(([,row])=>row.reduce((sum,id)=>sum+size(id).width+48,0)))+48;
+ let y=66;
+ for(const [,row] of ordered){
+  const rowWidth=row.reduce((sum,id)=>sum+size(id).width+48,0);
+  let x=24+(width-48-rowWidth)/2;
+  for(const id of row){positions[id]={x,y};x+=size(id).width+48;}
+  y+=Math.max(180,...row.map(id=>size(id).height))+65;
+ }
+ return {positions,width,height:Math.max(230,y+50),backs};
 }

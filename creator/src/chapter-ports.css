@@ -1,0 +1,28 @@
+.chapter-display-handle{opacity:0!important;pointer-events:none!important}
+.chapter-container-badge{display:inline-block;padding:1px 5px;margin-right:7px;border:1px solid #45615a;border-radius:4px;color:#9dbbb0;font-size:9px;font-weight:400;vertical-align:middle}
+.chapter-proxy-ports{padding:0 14px 14px;font-size:11px;color:#b8cbc9;text-align:left}
+.chapter-proxy-entry{position:relative;display:flex;align-items:center;gap:9px;border-bottom:1px solid #36504e;padding:7px 0 10px;margin-bottom:8px;min-width:0}
+.chapter-proxy-entry>span{color:#8ea8a4;font-size:10px;flex-shrink:0}
+.chapter-proxy-entry>strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:500}
+.chapter-proxy-entry>.react-flow__handle{top:0;width:12px;height:12px;background:#a0d4c5;border:2px solid #28473f;z-index:7}
+.chapter-proxy-entry.is-connecting{background:#31574d66;border-radius:5px}
+.chapter-proxy-exits{display:flex;flex-direction:column;gap:5px}
+.chapter-proxy-exit{position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:43px;padding:4px 17px 4px 8px;border:1px solid #38534e;border-radius:6px;background:#172a2bbd}
+.chapter-proxy-exit>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d3e7df;line-height:1.5}
+.chapter-proxy-exit>small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#91aaa5!important;font-size:10px!important;line-height:1.5}
+.chapter-proxy-exit>.react-flow__handle{right:-7px;top:50%;width:13px!important;height:13px!important;border:2px solid #28473f;background:#a0d4c5;z-index:7}
+.native-ide .chapter-expand-entry{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:27px;padding:4px 7px;margin:0 0 8px;font-size:11px;border:1px solid #36504e;background:#203332;color:#adcbc3}
+.chapter-no-exits{display:block;padding:8px 0;color:#8da6a0;font-size:10px}
+.native-global-flow .flow-chapter-label{padding:7px 12px}
+.chapter-main-entry{width:17px!important;height:17px!important;background:#abdccc!important;border:3px solid #365f54!important;z-index:9}
+.chapter-navigation{display:flex;align-items:center;gap:7px;margin-top:5px;position:relative;font-size:10px}
+.native-ide .chapter-navigation .chapter-open{font-size:10px;min-height:23px;padding:3px 7px;background:#244039;border-color:#45665a}
+.chapter-endpoint-settings{position:relative}
+.chapter-endpoint-settings>summary{cursor:pointer;list-style:none;padding:4px 6px;color:#b3c9c2;border:1px solid #39554c;border-radius:4px}
+.chapter-endpoint-settings>div{position:absolute;top:30px;left:0;z-index:50;width:255px;background:#1b2c30;border:1px solid #4a675f;border-radius:7px;padding:12px;box-shadow:0 8px 24px #0007;display:grid;gap:9px}
+.chapter-endpoint-settings label{display:grid;gap:5px;font-size:11px}
+.chapter-endpoint-settings small{color:#9eb6ae!important;line-height:1.6}
+.chapter-next{position:relative;margin-left:auto;padding-right:7px}
+.native-ide .chapter-navigation select{font-size:10px;min-height:23px;padding:3px 4px;max-width:130px;background:#1b302d;border:1px solid #46695c;color:#bbd4c9;border-radius:4px}
+.native-ide .chapter-endpoint-settings select{max-width:none;width:100%}
+.chapter-next .chapter-main-exit{right:-12px;width:15px!important;height:15px!important;background:#abdccc;border:2px solid #365f54}

@@ -4,6 +4,7 @@ The managed RPY is the sole editable registry. Opening/scanning never writes it.
 """
 from __future__ import annotations
 import ast
+from .source_literals import literal_eval
 import copy
 import hashlib
 import json
@@ -46,7 +47,7 @@ def read_table(text):
         parsed = ast.parse(textwrap.dedent(raw.split('\n', 1)[1]))
         statement = parsed.body[0]
         if len(parsed.body) != 1 or not isinstance(statement, ast.Assign) or len(statement.targets) != 1 or not isinstance(statement.targets[0], ast.Name) or statement.targets[0].id != '_creator_asset_table': raise ValueError('无效数据块')
-        data = ast.literal_eval(statement.value)
+        data = literal_eval(statement.value)
     except (ValueError, TypeError, SyntaxError, IndexError) as exc: raise ValueError('素材表数据损坏，请在源码中修复或恢复历史。') from exc
     validate(data)
     return data
@@ -115,6 +116,7 @@ def augment(project, scripts, images, constants):
         previous = project.get('nativeAssetLibrary')
         table = data_from_library(previous) if previous else {'version': 1, 'entries': [], 'deleted': []}
     entries = {e['id']: copy.deepcopy(e) for e in table['entries']}
+    runtime_entries = {(e['runtime']['kind'], e['runtime']['key']): e for e in entries.values()}
     deleted = set(table.get('deleted', []))
     declarations, references, audio_variables = {}, {}, {}
     originals = copy.deepcopy(images)
@@ -123,7 +125,7 @@ def augment(project, scripts, images, constants):
     def seed(kind, key, asset=None, source=None, target=None):
         eid = stable(kind, key)
         if eid in deleted: return None
-        existing = next((e for e in entries.values() if e['runtime'] == {'kind': kind, 'key': key}), None)
+        existing = runtime_entries.get((kind, key))
         if existing is not None:
             if source: existing['source'] = source
             return existing
@@ -149,6 +151,7 @@ def augment(project, scripts, images, constants):
                 'temporary': asset.get('status') == 'placeholder', 'override': False,
                 'fallbackAlias': asset.get('fallbackAlias', ''), 'source': source, 'originalPath': asset.get('nativeGamePath', '')}
         elif source: entries[eid]['source'] = source
+        runtime_entries[(kind, key)] = entries[eid]
         return entries[eid]
 
     for item, text in scripts:
@@ -166,7 +169,7 @@ def augment(project, scripts, images, constants):
                 image_block = row.rstrip().endswith(':')
             audio = re.match(r'^define\s+(audio\.[A-Za-z_]\w*)\s*=\s*(' + TOKEN + r')', row)
             if audio:
-                try: path = ast.literal_eval(audio[2])
+                try: path = literal_eval(audio[2])
                 except (ValueError, SyntaxError): continue
                 if isinstance(path, str) and Path(path).suffix.lower() in AUDIO:
                     try: game_path(path)
@@ -177,7 +180,7 @@ def augment(project, scripts, images, constants):
                     if e: e['originalPath'] = path
             if not match and not image_block and not row.lstrip().startswith('#'):
                 for token in re.finditer(TOKEN, row):
-                    try: path = ast.literal_eval(token[0])
+                    try: path = literal_eval(token[0])
                     except (ValueError, SyntaxError): continue
                     if not isinstance(path, str) or Path(path).suffix.lower() not in IMAGE | AUDIO or path.startswith(('<', '/')): continue
                     try: game_path(path)
@@ -206,7 +209,7 @@ def augment(project, scripts, images, constants):
             keys = set(re.findall(r'\baudio\.[A-Za-z_]\w*', row))
             if image_ref: keys.add(image_ref[1].strip())
             for match in re.finditer(TOKEN, row):
-                try: keys.add(ast.literal_eval(match[0]))
+                try: keys.add(literal_eval(match[0]))
                 except (ValueError, SyntaxError, TypeError): pass
             for key in keys:
                 for eid in reference_keys.get(key, []):
