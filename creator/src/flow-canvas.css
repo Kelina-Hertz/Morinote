@@ -22,3 +22,4 @@
 .native-global-flow .flow-inspector-identity h2{font-size:15px;margin:0;overflow-wrap:anywhere}
 .native-global-flow .flow-inspector .flow-source-details>div{display:flex;flex-direction:column;gap:7px}
 .native-global-flow .global-flow-canvas{outline:none}
+.flow-create-menu kbd{margin-left:auto;font:10px inherit;color:#8da7b0;opacity:.8}.flow-node-menu{min-width:230px;max-width:260px}.flow-node-menu>strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.flow-node-menu button{gap:8px}.flow-node-menu .flow-menu-delete{color:#efb0b0}.flow-menu-reason{font-size:11px;line-height:1.6;color:#a6bac1;white-space:normal;padding:4px 8px}.flow-node-menu button:disabled{opacity:.45;cursor:default}

@@ -1,8 +1,8 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ReactFlow,Background,Controls,MiniMap,MarkerType,Position,type Node,type Viewport,type ReactFlowInstance,type Connection} from '@xyflow/react';
-import {Plus,Code2,Play,ChevronDown,Workflow,X,Settings2} from 'lucide-react';
+import {Plus,Code2,Play,ChevronDown,Workflow,X,Settings2,Copy,Scissors,Trash2,ClipboardPaste} from 'lucide-react';
 import type {Project} from './types';
-import type {NativeFlow as Flow,NativeOperation,SourceLocation,FlowEditPoint,NativeFlowNode} from './native-types';
+import type {NativeFlow as Flow,NativeOperation,SourceLocation,FlowEditPoint,NativeFlowNode,FlowBlockClipboard} from './native-types';
 import {Modal} from './ui';
 import {storyLayout,type LayoutDirection} from './story-layout';
 import {sceneTitle} from './scene-titles';
@@ -25,9 +25,11 @@ type InsertPreview={edge:string;point:FlowEditPoint;scene:string;scenePoint:stri
 type ChapterSettings={chapterEntries?:Record<string,string>;chapterExitPoints?:Record<string,string>};
 const nodeTypes={group:ChapterNode,story:StoryNode,quickCreate:CanvasQuickCreate};
 
-export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource,onScene,onPreview,onLayout,currentLabel}:{flow:Flow;project:Project;onOperation:NativeOperation;onSource:(s:SourceLocation)=>void;onScene:(id:string,context?:{callerLabel:string;source:SourceLocation})=>void;onPreview:(label:string)=>void;onLayout:(patch:Record<string,unknown>,undoable?:boolean)=>Promise<void>;currentLabel?:string}){
+export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource,onScene,onPreview,onLayout,currentLabel,clipboard,onClipboard,onCopyBlock}:{flow:Flow;project:Project;onOperation:NativeOperation;onSource:(s:SourceLocation)=>void;onScene:(id:string,context?:{callerLabel:string;source:SourceLocation})=>void;onPreview:(label:string)=>void;onLayout:(patch:Record<string,unknown>,undoable?:boolean)=>Promise<void>;currentLabel?:string;clipboard:FlowBlockClipboard|null;onClipboard:(value:FlowBlockClipboard|null)=>void;onCopyBlock:(operation:Record<string,unknown>)=>Promise<FlowBlockClipboard>}){
  const [detailed,setDetailed]=useState(false),[focusGroup,setFocusGroup]=useState(''),[copiesOpen,setCopiesOpen]=useState(false),[pendingScene,setPendingScene]=useState(''),[notice,setNotice]=useState('');
  const [connectionFeedback,setConnectionFeedback]=useState<{message:string}|null>(null);
+ const [nodeMenu,setNodeMenu]=useState<{id:string;x:number;y:number}|null>(null);
+ useEffect(()=>{const dismiss=(event:PointerEvent)=>{if(!(event.target as HTMLElement).closest('.flow-create-menu')){setNodeMenu(null);setMenu(null);}};document.addEventListener('pointerdown',dismiss);return()=>document.removeEventListener('pointerdown',dismiss);},[]);
  useEffect(()=>{
   if(!connectionFeedback)return;
   const timer=window.setTimeout(()=>setConnectionFeedback(null),3500);
@@ -105,7 +107,7 @@ export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource
   const group=point?sourceFlow.nodes.find(n=>n.id===point.owner)?.group||'剧情':containing?.id.slice(6)||selectedGroup?.title||node?.group||'剧情';
   return {x:Math.max(8,Math.min(x,window.innerWidth-230)),y:Math.max(8,Math.min(y,window.innerHeight-190)),position:point&&!dropped?{x:position.x+330,y:position.y+100}:position,point,group};
  }
- function openPalette(x:number,y:number,point?:FlowEditPoint,dropped?:CanvasPosition){if(quick)return;setMenu(creationContext(x,y,point,dropped));setError('');}
+ function openPalette(x:number,y:number,point?:FlowEditPoint,dropped?:CanvasPosition){if(quick)return;setNodeMenu(null);setMenu(creationContext(x,y,point,dropped));setError('');}
  function vacantPosition(position:CanvasPosition){
   const all=canvas.current?.getNodes()||[];
   const boxes=all.filter(n=>n.type==='story').map(n=>{const parent=all.find(p=>p.id===n.parentId);return {x:n.position.x+(parent?.position.x||0),y:n.position.y+(parent?.position.y||0),width:n.measured?.width||282,height:n.measured?.height||220};});
@@ -174,6 +176,49 @@ export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource
  function disconnect(ids:string[]){
   if(!ids.length)return;
   void graphChange({operation:'disconnect_exits',points:ids,hashes:flowHashes(sourceFlow.authoring!.documents,[])},'已断开，等待连接').catch(e=>setError(e.message));
+ }
+ function blockReason(original:NativeFlowNode|undefined,removing=false){
+  if(!original||original.type!=='scene')return '此节点属于场景内容，请双击编辑。';
+  const block=sourceFlow.authoring?.blocks?.[original.label];
+  return block?(removing?block.deleteReason:block.copyReason):'此剧情暂不能整块编辑，请查看源码。';
+ }
+ function menuKeys(event:React.KeyboardEvent<HTMLDivElement>,original?:NativeFlowNode){
+  const key=event.key.toLowerCase();
+  if(event.key==='Escape'){event.preventDefault();setMenu(null);setNodeMenu(null);canvasElement.current?.focus({preventScroll:true});}
+  else if((event.ctrlKey||event.metaKey)&&['c','x','v'].includes(key)){
+   event.preventDefault();if(key==='v')void pasteBlock(menu||undefined);else if(original)void copyBlock(original,key==='x');
+  }else if(original&&['Delete','Backspace'].includes(event.key)){event.preventDefault();void deleteBlock(original);}
+  else if(['ArrowDown','ArrowUp'].includes(event.key)){
+   event.preventDefault();const items=[...event.currentTarget.querySelectorAll<HTMLButtonElement>('button:not(:disabled)')],index=items.indexOf(document.activeElement as HTMLButtonElement);
+   items[(index+(event.key==='ArrowDown'?1:-1)+items.length)%items.length]?.focus();
+  }
+ }
+ async function copyBlock(original:NativeFlowNode,cut=false){
+  if(changing.current||quick)return;
+  const reason=blockReason(original,cut);if(reason){setError(reason);return;}
+  changing.current=true;setGraphBusy(true);setError('');setMenu(null);setNodeMenu(null);
+  try{
+   const value=await onCopyBlock({operation:'copy_block',node:original.label,cut,title:sceneTitle(project,original.label),group:original.group,hashes:flowHashes(sourceFlow.authoring!.documents,[])});
+   if(cut){await onOperation('flow',{operation:'delete_block',node:original.label,hashes:flowHashes(sourceFlow.authoring!.documents,[])});setSelected('');setSelectedNodes([]);setSelectedEdges([]);}
+   onClipboard(value);canvasElement.current?.focus({preventScroll:true});setNotice(cut?'已剪切 · 在空白处右键粘贴 · 未保存':'已复制 · 在空白处右键粘贴');
+  }catch(e){setError(e instanceof Error?e.message:String(e));}
+  finally{changing.current=false;setGraphBusy(false);}
+ }
+ async function deleteBlock(original:NativeFlowNode){
+  const reason=blockReason(original,true);if(reason){setError(reason);return;}
+  setMenu(null);setNodeMenu(null);
+  try{await graphChange({operation:'delete_block',node:original.label,hashes:flowHashes(sourceFlow.authoring!.documents,[])},'已删除剧情块，上游出口待连接');setSelected('');setSelectedNodes([]);setSelectedEdges([]);canvasElement.current?.focus({preventScroll:true});}
+  catch(e){setError(e instanceof Error?e.message:String(e));}
+ }
+ async function pasteBlock(context?:CanvasMenu){
+  if(!clipboard||changing.current||quick)return;
+  const bounds=canvasElement.current?.getBoundingClientRect(),ctx=context||creationContext((bounds?.left||0)+(bounds?.width||800)/2,(bounds?.top||0)+(bounds?.height||500)/2);
+  const scene={...freshScene(project,ctx.group),title:clipboard.title};
+  if(clipboard.cut){scene.name=clipboard.name;scene.path=clipboard.path;}
+  else{const base=clipboard.title.slice(0,112)+' 副本';scene.title=base;let i=2;while(project.nativeRenpy?.labels.some(l=>sceneTitle(project,l.id)===scene.title))scene.title=base+' '+i++;}
+  setMenu(null);setNodeMenu(null);
+  try{await graphChange({operation:'paste_block',clipboard:clipboard.token,scene,hashes:flowHashes(sourceFlow.authoring!.documents,[scene])},'已粘贴剧情块');setUnlinkedOnly(false);setPendingScene(scene.name);setCollapsed(v=>v.filter(g=>g!==ctx.group));setPlacement({name:scene.name,position:vacantPosition(ctx.position)});if(clipboard.cut)onClipboard(null);canvasElement.current?.focus({preventScroll:true});}
+  catch(e){setError(e instanceof Error?e.message:String(e));}
  }
  async function endOutlet(point:FlowEditPoint){setMenu(null);await graphChange({operation:'end_exits',points:[point.id],hashes:flowHashes(sourceFlow.authoring!.documents,[])},'已设为结束此段');}
  function insertAtNode(dragged:Node):InsertPreview|null{
@@ -326,7 +371,19 @@ export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource
   </div></div>
   {error&&<div className="flow-connection-error" role="alert"><span>{error}</span><button className="icon-button" aria-label="关闭错误提示" onClick={()=>setError('')}><X size={13}/></button></div>}
   <div className="global-flow-body"><section className="global-flow-canvas" ref={canvasElement} tabIndex={0} onKeyDown={event=>{
-   if(!event.altKey||!['ArrowDown','ArrowRight'].includes(event.key)||(event.target as HTMLElement).closest('input,textarea,select,[role=dialog]'))return;
+   if((event.target as HTMLElement).closest('input,textarea,select,[role=dialog],[role=menu],[contenteditable=true]'))return;
+   if(event.key==='Escape'){setMenu(null);setNodeMenu(null);return;}
+   if(graphBusy||quick)return;
+   const modifier=event.ctrlKey||event.metaKey,key=event.key.toLowerCase();
+   if(modifier&&['c','x','v'].includes(key)){
+    event.preventDefault();if(key==='v')void pasteBlock();else if(node)void copyBlock(node,key==='x');return;
+   }
+   if(['Delete','Backspace'].includes(event.key)){
+    event.preventDefault();if(selectedEdges.length){disconnect(edges.filter(e=>selectedEdges.includes(e.id)).flatMap(e=>typeof e.data?.point==='string'?[e.data.point]:[]));return;}
+    if(selectedNodes.filter(id=>!id.startsWith('group:')).length>1){setError('请逐个删除剧情块。');return;}
+    if(node)void deleteBlock(node);return;
+   }
+   if(!event.altKey||!['ArrowDown','ArrowRight'].includes(event.key))return;
    event.preventDefault();const outputs=node?pointsForNode(sourceFlow,node.id):[];
    if(outputs.length!==1){setConnectionFeedback({message:'请使用具体出口旁的＋'});return;}
    newBlock('scene',creationContext(0,0,outputs[0],nodePosition(node!.id)));
@@ -334,7 +391,7 @@ export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource
    {insertPreview&&<p className="flow-canvas-hint" role="status">{insertPreview.message}</p>}
    {(connectionFeedback||notice)&&<div className="flow-connection-feedback" role="status"><span>{connectionFeedback?.message||notice}</span><button className="icon-button" aria-label="关闭提示" onClick={()=>{setConnectionFeedback(null);setNotice('');}}><X size={13}/></button></div>}
    {unlinkedOnly&&!flow.nodes.length&&<p className="flow-empty" role="status">没有未接入主线的剧情</p>}
-<ReactFlow autoPanOnNodeFocus={false} key={detailed?'detail':'story'} onInit={instance=>{canvas.current=instance;if(layoutVersion!==5||!viewport){const targets=nodes.filter(n=>n.parentId).sort((a,b)=>a.position.y-b.position.y).slice(0,3);requestAnimationFrame(()=>void instance.fitView({nodes:targets.length?targets:nodes,padding:.25,minZoom:.55,maxZoom:1}));}}} nodes={nodes} edges={edges} nodeTypes={nodeTypes} minZoom={0.05} defaultViewport={layoutVersion===5?viewport:undefined} fitView={false} onNodesChange={changes=>{if(changes.some(c=>c.type==='dimensions'&&c.dimensions))setMeasurements(current=>{let next=current;for(const c of changes)if(c.type==='dimensions'&&c.dimensions&&(current[c.id]?.width!==c.dimensions.width||current[c.id]?.height!==c.dimensions.height))next={...next,[c.id]:c.dimensions};return next;});const selection=changes.find(c=>c.type==='select'&&c.selected);if(selection?.type==='select')setSelected(selection.id);if(changes.some(change=>change.type==='select'))setSelectedNodes(current=>{const next=new Set(current);for(const change of changes)if(change.type==='select'){if(change.selected)next.add(change.id);else next.delete(change.id);}return next.size===current.length&&current.every(id=>next.has(id))?current:[...next];});setPositions(current=>{let next=current;for(const c of changes)if(c.type==='position'&&c.position&&!c.id.startsWith('group:')&&(current[c.id]?.x!==c.position.x||current[c.id]?.y!==c.position.y)){next={...next,[c.id]:c.position};}return next;});}} nodesConnectable={!graphBusy} deleteKeyCode={['Backspace','Delete']} isValidConnection={connection=>validConnection(connection)} onConnectStart={(_,params)=>{setConnectionFeedback(null);connectionRef.current=params.handleId||null;setConnecting(params.handleId||null);setHovered('');hoveredRef.current='';}} onReconnectStart={(_,edge,type)=>{setConnectionFeedback(null);if(type==='target'&&typeof edge.data?.point==='string'){connectionRef.current=edge.data.point;setConnecting(edge.data.point);}}} onReconnectEnd={()=>clearConnection()} onNodeMouseEnter={(_,n)=>{if(connectionRef.current){hoveredRef.current=n.id;setHovered(n.id);}}} onNodeMouseLeave={(_,n)=>{if(hoveredRef.current===n.id){hoveredRef.current='';setHovered('');}}} connectionRadius={40} nodesDraggable={!graphBusy} onConnect={connect} onReconnect={(edge,connection)=>{const point=edge.data?.point;const sourceHandle=edge.sourceHandle||String(point||'');if(typeof point==='string'&&validConnection({...connection,sourceHandle}))connect({...connection,sourceHandle});}} zoomOnDoubleClick={false} onNodeClick={(event,n)=>{setSelected(n.id);if(!event.ctrlKey&&!event.metaKey&&!event.shiftKey)setSelectedNodes(current=>current.length===1&&current[0]===n.id?current:[n.id]);setSelectedEdges([]);}} onPaneClick={event=>{setConnectionFeedback(null);setSelected('');setSelectedNodes([]);setSelectedEdges([]);if(event.detail===2&&!quick)openPalette(event.clientX,event.clientY);else setMenu(null);}} onPaneContextMenu={event=>{event.preventDefault();if(quick)return;openPalette(event.clientX,event.clientY);}} onConnectEnd={(event,state)=>{const over=hoveredRef.current;clearConnection();if(state.isValid)return;if(state.toNode||over){const id=state.toNode?.id||over;setConnectionFeedback({message:id.startsWith('group:')?chapterModels.get(id.slice(6))?.entry?'请拖到章节顶部的入口圆点':chapterModels.get(id.slice(6))?.entryReason||'请先设置章节入口':sourceFlow.authoring?.targets.find(t=>t.id===id)?.reason||'此处无法连接'});return;}if(state.fromHandle?.type!=='source'||!state.fromHandle.id)return;const point=sourcePoint(state.fromNode?.id||null,state.fromHandle.id);if(!point||!point.actions.includes('connect'))return;const cursor='changedTouches' in event?event.changedTouches[0]:event;if(cursor)openPalette(cursor.clientX,cursor.clientY,point,canvas.current?.screenToFlowPosition({x:cursor.clientX,y:cursor.clientY}));}} onEdgesChange={changes=>setSelectedEdges(current=>{const next=new Set(current);for(const change of changes)if(change.type==='select'){if(change.selected)next.add(change.id);else next.delete(change.id);}return [...next];})} onEdgesDelete={deleted=>disconnect(deleted.flatMap(e=>typeof e.data?.point==='string'?[e.data.point]:[]))} onNodeDoubleClick={(_,n)=>{if(n.id.startsWith('group:'))void toggle(n.id.slice(6)).catch(e=>setError(e.message));else{const original=flow.nodes.find(x=>x.id===n.id);if(original)openContent(original);}}} onNodeDragStart={()=>{lastDragCheck.current=0;}} onNodeDrag={(_,n)=>previewInsertion(n)} onNodeDragStop={(_,n,moved)=>void stopNodeDrag(n,moved)} onMoveEnd={(event,nextViewport)=>{if(event)void onLayout(detailed?{detailFlowViewport:nextViewport,detailFlowLayoutVersion:5}:{storyFlowViewport:nextViewport,storyFlowLayoutVersion:5}).catch(e=>setError(e.message));}}><Background color="#263f43"/><Controls/><MiniMap/></ReactFlow>
+<ReactFlow autoPanOnNodeFocus={false} key={detailed?'detail':'story'} onInit={instance=>{canvas.current=instance;if(layoutVersion!==5||!viewport){const targets=nodes.filter(n=>n.parentId).sort((a,b)=>a.position.y-b.position.y).slice(0,3);requestAnimationFrame(()=>void instance.fitView({nodes:targets.length?targets:nodes,padding:.25,minZoom:.55,maxZoom:1}));}}} nodes={nodes} edges={edges} nodeTypes={nodeTypes} minZoom={0.05} defaultViewport={layoutVersion===5?viewport:undefined} fitView={false} onNodesChange={changes=>{if(changes.some(c=>c.type==='dimensions'&&c.dimensions))setMeasurements(current=>{let next=current;for(const c of changes)if(c.type==='dimensions'&&c.dimensions&&(current[c.id]?.width!==c.dimensions.width||current[c.id]?.height!==c.dimensions.height))next={...next,[c.id]:c.dimensions};return next;});const selection=changes.find(c=>c.type==='select'&&c.selected);if(selection?.type==='select')setSelected(selection.id);if(changes.some(change=>change.type==='select'))setSelectedNodes(current=>{const next=new Set(current);for(const change of changes)if(change.type==='select'){if(change.selected)next.add(change.id);else next.delete(change.id);}return next.size===current.length&&current.every(id=>next.has(id))?current:[...next];});setPositions(current=>{let next=current;for(const c of changes)if(c.type==='position'&&c.position&&!c.id.startsWith('group:')&&(current[c.id]?.x!==c.position.x||current[c.id]?.y!==c.position.y)){next={...next,[c.id]:c.position};}return next;});}} nodesConnectable={!graphBusy} deleteKeyCode={null} isValidConnection={connection=>validConnection(connection)} onConnectStart={(_,params)=>{setConnectionFeedback(null);connectionRef.current=params.handleId||null;setConnecting(params.handleId||null);setHovered('');hoveredRef.current='';}} onReconnectStart={(_,edge,type)=>{setConnectionFeedback(null);if(type==='target'&&typeof edge.data?.point==='string'){connectionRef.current=edge.data.point;setConnecting(edge.data.point);}}} onReconnectEnd={()=>clearConnection()} onNodeMouseEnter={(_,n)=>{if(connectionRef.current){hoveredRef.current=n.id;setHovered(n.id);}}} onNodeMouseLeave={(_,n)=>{if(hoveredRef.current===n.id){hoveredRef.current='';setHovered('');}}} connectionRadius={40} nodesDraggable={!graphBusy} onConnect={connect} onReconnect={(edge,connection)=>{const point=edge.data?.point;const sourceHandle=edge.sourceHandle||String(point||'');if(typeof point==='string'&&validConnection({...connection,sourceHandle}))connect({...connection,sourceHandle});}} zoomOnDoubleClick={false} onNodeClick={(event,n)=>{setNodeMenu(null);setMenu(null);setSelected(n.id);if(!event.ctrlKey&&!event.metaKey&&!event.shiftKey)setSelectedNodes(current=>current.length===1&&current[0]===n.id?current:[n.id]);setSelectedEdges([]);}} onPaneClick={event=>{setNodeMenu(null);setConnectionFeedback(null);setSelected('');setSelectedNodes([]);setSelectedEdges([]);if(event.detail===2&&!quick)openPalette(event.clientX,event.clientY);else setMenu(null);}} onNodeContextMenu={(event,n)=>{event.preventDefault();event.stopPropagation();if(graphBusy||quick||n.type!=='story')return;setMenu(null);setSelected(n.id);setSelectedNodes([n.id]);setSelectedEdges([]);setNodeMenu({id:n.id,x:Math.max(8,Math.min(event.clientX,window.innerWidth-260)),y:Math.max(8,Math.min(event.clientY,window.innerHeight-300))});}} onPaneContextMenu={event=>{event.preventDefault();if(quick)return;openPalette(event.clientX,event.clientY);}} onConnectEnd={(event,state)=>{const over=hoveredRef.current;clearConnection();if(state.isValid)return;if(state.toNode||over){const id=state.toNode?.id||over;setConnectionFeedback({message:id.startsWith('group:')?chapterModels.get(id.slice(6))?.entry?'请拖到章节顶部的入口圆点':chapterModels.get(id.slice(6))?.entryReason||'请先设置章节入口':sourceFlow.authoring?.targets.find(t=>t.id===id)?.reason||'此处无法连接'});return;}if(state.fromHandle?.type!=='source'||!state.fromHandle.id)return;const point=sourcePoint(state.fromNode?.id||null,state.fromHandle.id);if(!point||!point.actions.includes('connect'))return;const cursor='changedTouches' in event?event.changedTouches[0]:event;if(cursor)openPalette(cursor.clientX,cursor.clientY,point,canvas.current?.screenToFlowPosition({x:cursor.clientX,y:cursor.clientY}));}} onEdgesChange={changes=>setSelectedEdges(current=>{const next=new Set(current);for(const change of changes)if(change.type==='select'){if(change.selected)next.add(change.id);else next.delete(change.id);}return [...next];})} onEdgesDelete={deleted=>disconnect(deleted.flatMap(e=>typeof e.data?.point==='string'?[e.data.point]:[]))} onNodeDoubleClick={(_,n)=>{if(n.id.startsWith('group:'))void toggle(n.id.slice(6)).catch(e=>setError(e.message));else{const original=flow.nodes.find(x=>x.id===n.id);if(original)openContent(original);}}} onNodeDragStart={()=>{lastDragCheck.current=0;}} onNodeDrag={(_,n)=>previewInsertion(n)} onNodeDragStop={(_,n,moved)=>void stopNodeDrag(n,moved)} onMoveEnd={(event,nextViewport)=>{if(event)void onLayout(detailed?{detailFlowViewport:nextViewport,detailFlowLayoutVersion:5}:{storyFlowViewport:nextViewport,storyFlowLayoutVersion:5}).catch(e=>setError(e.message));}}><Background color="#263f43"/><Controls/><MiniMap/></ReactFlow>
   </section><DockPanel id="flow-inspector" title="节点信息" initialSize={300} minSize={240} initialCollapsed storageVersion={2}>
    <aside className="inspector flow-inspector">{node?<div className="inspector-body" key={node.id}>
     <header className="flow-inspector-identity"><Workflow size={22}/><h2>{displayTitle(node)}</h2></header>
@@ -354,8 +411,16 @@ export default function NativeFlow({flow:sourceFlow,project,onOperation,onSource
   </DockPanel></div>
   {copiesOpen&&<Modal title="剧本副本" onClose={()=>setCopiesOpen(false)}><div className="modal-body"><p>默认使用编号版</p>{sourceFlow.sourceCopies?.map(copy=><div className="flow-copy-row" key={copy.path}><button onClick={()=>{setCopiesOpen(false);onSource({path:copy.original,line:1});}}>原版 · {copy.original}</button><button onClick={()=>{setCopiesOpen(false);onSource({path:copy.path,line:1});}}>编号版 · {copy.path}</button></div>)}</div></Modal>}
   {intent&&<FlowAuthoringDialog mode="connect" point={intent.point} initialTarget={intent.target} flow={sourceFlow} project={project} onOperation={onOperation} onClose={()=>setIntent(null)} onComplete={result=>{setUnlinkedOnly(false);setNotice(result.message+' · 未保存');}}/>}
-  {menu&&<div className="flow-create-menu" role="menu" aria-label="新建剧情节点" style={{left:menu.x,top:menu.y}} onKeyDown={event=>{if(event.key==='Escape')setMenu(null);}}>
+  {nodeMenu&&(()=>{const original=flow.nodes.find(n=>n.id===nodeMenu.id),copyReason=blockReason(original),deleteReason=blockReason(original,true);return <div className="flow-create-menu flow-node-menu" role="menu" aria-label="剧情块操作" style={{left:nodeMenu.x,top:nodeMenu.y}} onKeyDown={event=>menuKeys(event,original)}>
+   <strong>{original?displayTitle(original):'剧情块'}</strong>
+   <button autoFocus role="menuitem" disabled={graphBusy||!!copyReason} title={copyReason||undefined} onClick={()=>original&&void copyBlock(original)}><Copy size={14}/>复制<kbd>Ctrl+C</kbd></button>
+   <button role="menuitem" disabled={graphBusy||!!deleteReason} title={deleteReason||undefined} onClick={()=>original&&void copyBlock(original,true)}><Scissors size={14}/>剪切<kbd>Ctrl+X</kbd></button>
+   <hr/><button className="flow-menu-delete" role="menuitem" disabled={graphBusy||!!deleteReason} title={deleteReason||undefined} onClick={()=>original&&void deleteBlock(original)}><Trash2 size={14}/>删除<kbd>Delete</kbd></button>
+   {(copyReason||deleteReason)&&<small className="flow-menu-reason">{copyReason||deleteReason}</small>}
+  </div>;})()}
+  {menu&&<div className="flow-create-menu" role="menu" aria-label="新建剧情节点" style={{left:menu.x,top:menu.y}} onKeyDown={event=>menuKeys(event)}>
    <strong>{menu.point?'添加后续':'新建'}</strong>
+   {!menu.point&&clipboard&&<><button role="menuitem" disabled={graphBusy} onClick={()=>void pasteBlock(menu)}><ClipboardPaste size={14}/>粘贴剧情块<kbd>Ctrl+V</kbd></button><hr/></>}
    <button autoFocus role="menuitem" onClick={()=>newBlock('scene',menu)}>剧情块</button>
    <button role="menuitem" onClick={()=>newBlock('choice',menu)}>选项分支</button>
    <button role="menuitem" onClick={()=>newBlock('condition',menu)}>条件判断</button>

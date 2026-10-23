@@ -138,6 +138,8 @@ def graph(root, project, sources=None, *, presentation_labels=None):
     result={'nodes':nodes,'edges':edges,'groups':list(groups.values())}
     from .flow_authoring import catalog
     result['authoring']=catalog(root,project,result,sources)
+    from .flow_blocks import capabilities
+    result['authoring']['blocks']=capabilities(project,documents)
     from .story_flow import project_flow
     result['story']=project_flow(result)
     result['storyDetail']=narrative_detail(result)
@@ -154,6 +156,9 @@ def graph(root, project, sources=None, *, presentation_labels=None):
 
 
 def edit(root, project, operation):
+    if operation.get('operation') in ('copy_block','delete_block','paste_block'):
+        from .flow_blocks import prepare
+        return prepare(root,project,operation)
     if operation.get('operation') in ('connect_exit','insert_after','branch_exit','create_block','disconnect_exits','end_exits','update_condition','rename_option','insert_existing'):
         from .flow_authoring import prepare
         return prepare(root,project,operation)
