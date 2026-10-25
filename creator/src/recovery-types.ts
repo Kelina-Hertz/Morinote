@@ -1,11 +1,19 @@
 import type {SourceDocument,SourceLocation} from './native-types';
 import type {SourceBuffer} from './native-buffers';
+import type {Asset} from './types';
 
 export interface RecoveryTab {
  id:string; title:string; kind:'flow'|'code'|'scene'|'config'|'assets'|'media'; target?:string;
  callContext?:{callerLabel:string;source:SourceLocation};
 }
+export interface RecoveryMetadata {
+ baseIde:Record<string,unknown>;
+ ide:Record<string,unknown>;
+ baseAssets?:Asset[];
+ assets?:Asset[];
+}
 export interface RecoveryState {
+ metadata?:RecoveryMetadata;
  documents:SourceBuffer[];
  tabs:RecoveryTab[];
  active:string;

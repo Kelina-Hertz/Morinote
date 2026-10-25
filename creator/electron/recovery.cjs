@@ -67,6 +67,7 @@ function validateState(input) {
   if (!serialized || Buffer.byteLength(serialized) > MAX_STATE) throw new Error('恢复草稿超过 32 MiB，请先保存部分文件');
   const state = JSON.parse(serialized);
   if (!isObject(state) || !Array.isArray(state.documents) || state.documents.length > 200 || !Array.isArray(state.tabs) || state.tabs.length > 300) throw new Error('无效的恢复草稿');
+  if (state.metadata != null && (!isObject(state.metadata) || !isObject(state.metadata.baseIde) || !isObject(state.metadata.ide) || (state.metadata.assets !== undefined && (!Array.isArray(state.metadata.assets) || !Array.isArray(state.metadata.baseAssets))))) throw new Error('无效的配置恢复草稿');
   const paths = new Set();
   for (const document of state.documents) {
     if (!isObject(document) || !isObject(document.base)) throw new Error('无效的恢复文档');
@@ -249,7 +250,7 @@ class RecoveryStore {
     await this.prepareDirectory(context);
     const encoded = await this.encodeState(context, state);
     const time = new Date(Math.max(Date.now(), (Date.parse(context.latest?.time || context.clearedAt || '') || 0) + 1)).toISOString();
-    const fingerprint = hash(JSON.stringify(encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false])));
+    const fingerprint = hash(JSON.stringify([encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false]), encoded.metadata || null]));
     const manifest = { version: 1, projectId: context.projectId, sequence: payload.sequence, time, reason: payload.reason, fingerprint, paths: state.documents.filter(document => document.base.exists === false || document.value !== document.base.content).map(document => document.base.path), state: encoded };
     this.bound(payload);
     if (context.discardCorrupt) {
@@ -301,7 +302,7 @@ class RecoveryStore {
     const manifest = { version: 1, projectId: context.projectId, sequence: payload.sequence, time, reason: 'discard', cleared: true };
     if (state) {
       const encoded = await this.encodeState(context, state);
-      const fingerprint = hash(JSON.stringify(encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false])));
+      const fingerprint = hash(JSON.stringify([encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false]), encoded.metadata || null]));
       manifest.replacement = { version: 1, projectId: context.projectId, sequence: payload.sequence, time: new Date(Date.parse(time) + 1).toISOString(), reason: 'discard', fingerprint, paths: state.documents.filter(document => document.base.exists === false || document.value !== document.base.content).map(document => document.base.path), state: encoded };
     }
     this.bound(payload);

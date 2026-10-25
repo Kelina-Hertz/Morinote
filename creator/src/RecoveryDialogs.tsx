@@ -32,7 +32,7 @@ export interface RecoveryHistoryProps {
  loadSnapshot:(id:string)=>Promise<RecoveryResult>;
  readFiles:(paths:string[])=>Promise<RecoveryFiles>;
  buffers:Record<string,SourceBuffer>;
- onRestore:(state:RecoveryState,paths:string[])=>Promise<void>;
+ onRestore:(state:RecoveryState,paths:string[],whole?:boolean)=>Promise<void>;
 }
 
 export function RecoveryHistory({onClose,loadHistory,loadSnapshot,readFiles,buffers,onRestore}:RecoveryHistoryProps){
@@ -71,10 +71,10 @@ export function RecoveryHistory({onClose,loadHistory,loadSnapshot,readFiles,buff
   }catch(caught){if(alive.current&&request===listRequest.current)setError(message(caught));}
   finally{if(alive.current&&request===listRequest.current)setLoading(false);}
  }
- async function restore(paths:string[]){
-  if(!snapshot||!paths.length||restorePending.current||loadingSnapshot)return;
+ async function restore(paths:string[],whole=false){
+  if(!snapshot||(!paths.length&&!(whole&&snapshot.metadata))||restorePending.current||loadingSnapshot)return;
   restorePending.current=true;setRestoring(true);setError('');
-  try{await callbacks.current.onRestore(snapshot,paths);if(alive.current)callbacks.current.onClose();}
+  try{await callbacks.current.onRestore(snapshot,paths,whole);if(alive.current)callbacks.current.onClose();}
   catch(caught){if(alive.current)setError(message(caught));}
   finally{restorePending.current=false;if(alive.current)setRestoring(false);}
  }
@@ -97,11 +97,11 @@ export function RecoveryHistory({onClose,loadHistory,loadSnapshot,readFiles,buff
    <div className="recovery-history-detail">
     {loadingSnapshot?<p className="recovery-placeholder" role="status">读取快照与当前文件…</p>:snapshot?<>
      <label className="recovery-file-picker"><span>文件</span><select value={selectedPath} disabled={restoring} onChange={event=>setSelectedPath(event.target.value)}>{snapshot.documents.map(document=><option key={document.base.path} value={document.base.path}>{document.base.path}</option>)}</select></label>
-     {saved?<><p className="recovery-comparison-caption">{equal?'与当前内容相同':'变更范围已标记'}</p><div className="recovery-versions"><TextVersion title={currentBuffer?'当前编辑内容':'磁盘内容'} text={currentText} range={range?.before} metadata={formatLabel(currentBuffer?.base||currentDisk)} empty={!currentBuffer&&readError?`读取失败：${readError}`:currentMissing?'文件当前不存在':undefined}/><TextVersion title="历史草稿" text={saved.value} range={range?.after} metadata={formatLabel(saved.base)}/></div></>:<p className="recovery-placeholder">此快照没有文档内容。</p>}
+     {saved?<><p className="recovery-comparison-caption">{equal?'与当前内容相同':'变更范围已标记'}</p><div className="recovery-versions"><TextVersion title={currentBuffer?'当前编辑内容':'磁盘内容'} text={currentText} range={range?.before} metadata={formatLabel(currentBuffer?.base||currentDisk)} empty={!currentBuffer&&readError?`读取失败：${readError}`:currentMissing?'文件当前不存在':undefined}/><TextVersion title="历史草稿" text={saved.value} range={range?.after} metadata={formatLabel(saved.base)}/></div></>:<p className="recovery-placeholder">此快照没有文档内容。</p>}{snapshot.metadata&&<details><summary>配置与布局草稿</summary><pre>{JSON.stringify(snapshot.metadata,null,2)}</pre></details>}
     </>:<p className="recovery-placeholder">选择一个快照查看内容。</p>}
    </div>
   </div>
-  <div className="modal-actions recovery-actions"><span role="status">{restoring?'正在备份当前草稿并恢复…':''}</span><button className="secondary" disabled={restoring} onClick={close}>关闭</button><button className="secondary" disabled={!saved||loadingSnapshot||restoring} onClick={()=>void restore([selectedPath])}>恢复此文件</button><button className="primary" disabled={!snapshot?.documents.length||loadingSnapshot||restoring} onClick={()=>void restore(snapshot!.documents.map(document=>document.base.path))}>恢复整个快照</button></div>
+  <div className="modal-actions recovery-actions"><span role="status">{restoring?'正在备份当前草稿并恢复…':''}</span><button className="secondary" disabled={restoring} onClick={close}>关闭</button><button className="secondary" disabled={!saved||loadingSnapshot||restoring} onClick={()=>void restore([selectedPath])}>恢复此文件</button><button className="primary" disabled={(!snapshot?.documents.length&&!snapshot?.metadata)||loadingSnapshot||restoring} onClick={()=>void restore(snapshot!.documents.map(document=>document.base.path),true)}>恢复整个快照</button></div>
  </Modal>;
 }
 

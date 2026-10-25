@@ -8,6 +8,10 @@ contextBridge.exposeInMainWorld('creator', Object.freeze({
   mediaUrl: (id) => ipcRenderer.invoke('creator:mediaUrl', id),
   recovery: (method, payload) => ipcRenderer.invoke('creator:recovery', method, payload),
   openRenpy: (payload) => ipcRenderer.invoke('creator:openRenpy', payload),
+  setUnsavedChanges: (state) => {
+    if (typeof state?.dirty !== 'boolean' || typeof state.projectSession !== 'string') throw new TypeError('unsaved state required');
+    ipcRenderer.send('creator:unsaved-changes', { dirty: state.dirty, projectSession: state.projectSession });
+  },
   onPrepareClose: (callback) => {
     if (typeof callback !== 'function') throw new TypeError('callback required');
     const listener = async (_event, request) => {

@@ -1,6 +1,6 @@
 {
   "name": "morinote-ide-offline",
-  "version": "0.2.22-no-ai.1",
+  "version": "0.2.23-no-ai.1",
   "private": true,
   "description": "Local Morinote RenPy IDE without AI services",
   "main": "electron/main.cjs",
@@ -32,7 +32,7 @@
     "appId": "studio.morinote.ide.offline",
     "productName": "Morinote IDE",
     "directories": {
-      "output": "release-0.2.22-no-ai.1"
+      "output": "release-0.2.23-no-ai.1"
     },
     "files": [
       "dist/**/*",

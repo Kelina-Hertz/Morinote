@@ -21,7 +21,7 @@ const token = crypto.randomBytes(32).toString('hex');
 const recovery = new RecoveryStore();
 const pendingSourceMutations = new Set();
 const SOURCE_MUTATIONS = new Set(['/api/workspace/save', '/api/workspace/restore', '/api/workspace/rename', '/api/workspace/operation', '/api/project/source']);
-let recoveryReady = false, closeAllowed = false, closePending = null;
+let recoveryReady = false, editorDirty = false, closeAllowed = false, closePending = null;
 
 async function backendRequest(route, body, options = {}) {
   const method = routeMethod(route, body);
@@ -36,7 +36,11 @@ async function backendRequest(route, body, options = {}) {
     error.code = 'BACKEND_TRANSPORT'; throw error;
   }
   if (!response.ok) { const error = new Error(value.error ?? `本地服务错误：${response.status}`); error.code = 'BACKEND_TOOL'; error.status = response.status; throw error; }
-  if (['/api/project', '/api/project/open', '/api/project/new', '/api/project/migrate'].includes(route.split('?')[0])) await recovery.register(value);
+  if (['/api/project', '/api/project/open', '/api/project/new', '/api/project/migrate'].includes(route.split('?')[0])) {
+    const previousSession = recovery.context?.session;
+    await recovery.register(value);
+    if (recovery.context?.session !== previousSession) editorDirty = false;
+  }
   return value;
 }
 
@@ -120,6 +124,11 @@ function registerIPC() {
   ipcMain.on('creator:recovery-ready', (event, ready) => {
     if (trustedSender(event, window, loadedURL)) recoveryReady = ready === true;
   });
+  ipcMain.on('creator:unsaved-changes', (event, state) => {
+    if (!trustedSender(event, window, loadedURL) || typeof state?.dirty !== 'boolean' ||
+        !state.projectSession || state.projectSession !== recovery.context?.session) return;
+    editorDirty = state.dirty;
+  });
   ipcMain.on('creator:close-result', (event, result) => {
     if (!trustedSender(event, window, loadedURL) || !closePending || result?.id !== closePending.id) return;
     closePending.resolve(result.cancelled === true ? false : result.ok === true ? null : String(result.error || '关闭准备失败'));
@@ -169,8 +178,9 @@ async function prepareClose() {
   if (!window || window.isDestroyed() || closePending) return;
   const id = crypto.randomUUID();
   const failure = await new Promise(resolve => {
-    // A save/discard prompt may stay open while the writer decides.
-    closePending = { id, resolve };
+    // Hot Exit requires a backup acknowledgement, not an unbounded UI wait.
+    const timer = setTimeout(() => resolve('等待草稿备份超时，现有备份仍然保留。'), 15000);
+    closePending = { id, timer, resolve: result => { clearTimeout(timer); resolve(result); } };
     window.webContents.send('creator:prepare-close', { id });
   });
   if (!window || window.isDestroyed() || closePending?.id !== id) return;
@@ -180,14 +190,16 @@ async function prepareClose() {
     closePending = null; closeAllowed = true; window.close(); return;
   }
   const result = await dialog.showMessageBox(window, {
-    type: 'warning', title: saving ? '正在保存源码' : '无法关闭 IDE',
-    message: saving ? '源码仍在保存，暂时不能关闭 IDE。' : '关闭准备失败，修改仍保留在编辑器中。',
-    detail: saving ? '请等待保存完成后重试，或取消关闭继续编辑。' : String(failure),
-    buttons: ['重试', '取消关闭'], defaultId: 0, cancelId: 1, noLink: true,
+    type: 'warning', title: saving ? '正在保存源码' : '草稿尚未确认备份',
+    message: saving ? '源码仍在保存，暂时不能关闭 IDE。' : '尚未确认最近修改已备份成功。',
+    detail: saving ? '请等待保存完成后重试，或取消关闭继续编辑。' : `${failure || '草稿备份未完成'}\n选择使用最近备份并退出，将放弃最后一次成功备份之后的修改；已有草稿和历史仍然保留。`,
+    buttons: saving ? ['重试', '取消关闭'] : ['重试备份', '取消关闭', '使用最近备份并退出'], defaultId: 0, cancelId: 1, noLink: true,
   });
   if (!window || window.isDestroyed() || closePending?.id !== id) return;
-  if (result.response === 0) { clearTimeout(closePending.timer); closePending = null; void prepareClose(); }
-  else cancelClose();
+  if (result.response === 0) { cancelClose(); void prepareClose(); }
+  else if (result.response === 2 && !pendingSourceMutations.size) {
+    clearTimeout(closePending.timer); closePending = null; closeAllowed = true; window.close();
+  } else cancelClose();
 }
 
 function createWindow() {
@@ -213,7 +225,7 @@ function createWindow() {
   window.webContents.on('will-navigate', (event, url) => { if (url !== loadedURL) event.preventDefault(); });
   window.webContents.on('will-attach-webview', event => event.preventDefault());
   window.on('close', event => {
-    if (!closeAllowed && recoveryReady && recovery.context) {
+    if (!closeAllowed && (editorDirty || pendingSourceMutations.size > 0)) {
       event.preventDefault(); void prepareClose();
     }
   });
