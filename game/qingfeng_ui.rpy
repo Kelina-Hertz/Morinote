@@ -648,7 +648,7 @@ screen OVA():
                     text (_("已完成") if ova_is_completed(novel["id"]) else _("开始阅读")) style "qf_text" xpos 1060 ypos 55
 
 screen ova_nvl(dialogue, items=None):
-    add "gui/scene/classroom1.png"
+    add "room1"
     add Solid("#06162680")
     add qf_panel() pos (120, 70) xysize (1680, 880)
     use qf_heading(ova_current_title or _("小说模式"), 184, 105)

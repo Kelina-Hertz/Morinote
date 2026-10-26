@@ -1,0 +1,1288 @@
+{
+  "schema_version": 1,
+  "import_date": "2026-10-26",
+  "generation_date": "2026-10-24",
+  "model": "gpt-image-2.5-sunburst",
+  "source_directory": "game/scene_photo",
+  "asset_directory": "game/gui/scene/campus",
+  "native_size": [
+    2048,
+    1152
+  ],
+  "display_size": [
+    1920,
+    1080
+  ],
+  "total": 90,
+  "total_bytes": 302206507,
+  "demo_replacements": [
+    {
+      "tag": "block",
+      "id": "003",
+      "file": "IMG_20260417_143507.png",
+      "previous_file": "gui/scene/block1.png",
+      "purpose": "日间林荫道"
+    },
+    {
+      "tag": "westcorch",
+      "id": "015",
+      "file": "IMG_20260418_162320.png",
+      "previous_file": "gui/scene/westcorch2.png",
+      "purpose": "操场全景"
+    },
+    {
+      "tag": "westcorch_l",
+      "id": "025",
+      "file": "IMG_20260418_162614.png",
+      "previous_file": "gui/scene/westcorch4.png",
+      "purpose": "帐篷侧向近景"
+    },
+    {
+      "tag": "westcorch_r",
+      "id": "011",
+      "file": "IMG_20260418_161743.png",
+      "previous_file": "gui/scene/westcorch1.png",
+      "purpose": "另一组帐篷机位"
+    },
+    {
+      "tag": "westcorch2",
+      "id": "012",
+      "file": "IMG_20260418_161827.png",
+      "previous_file": "gui/scene/westcorch3.png",
+      "purpose": "沿跑道的操场机位"
+    },
+    {
+      "tag": "block_n1",
+      "id": "056",
+      "file": "IMG_20260418_194119.png",
+      "previous_file": "gui/scene/block_n1.png",
+      "purpose": "前往教学楼的夜路"
+    },
+    {
+      "tag": "block_n2",
+      "id": "072",
+      "file": "IMG_20260418_194725.png",
+      "previous_file": "gui/scene/block_n2.png",
+      "purpose": "离开大会的夜间林荫道"
+    },
+    {
+      "tag": "w12_1",
+      "id": "063",
+      "file": "IMG_20260418_194453_1.png",
+      "previous_file": "gui/scene/west12_3.png",
+      "purpose": "教学楼外入口"
+    },
+    {
+      "tag": "w12_2",
+      "id": "035",
+      "file": "IMG_20260418_192935.png",
+      "previous_file": "gui/scene/west12_2.png",
+      "purpose": "进入楼内的中庭"
+    },
+    {
+      "tag": "room1",
+      "id": "084",
+      "file": "IMG_20260418_195653.png",
+      "previous_file": "gui/scene/classroom1.png",
+      "purpose": "教室前向正面及小说阅读底图"
+    },
+    {
+      "tag": "room2",
+      "id": "083",
+      "file": "IMG_20260418_195651.png",
+      "previous_file": "gui/scene/classroom2.png",
+      "purpose": "大会教室前向"
+    },
+    {
+      "tag": "room3",
+      "id": "090",
+      "file": "IMG_20260418_195754.png",
+      "previous_file": "gui/scene/classroom3.png",
+      "purpose": "教室后向靠窗"
+    },
+    {
+      "tag": "room4",
+      "id": "086",
+      "file": "IMG_20260418_195721.png",
+      "previous_file": "gui/scene/classroom4.png",
+      "purpose": "教室后向中间过道"
+    }
+  ],
+  "preserved": {
+    "goko": "高中回忆，无相符的日间高中教室照片",
+    "domitory": "宿舍，无相符照片",
+    "qf": "剧情要求准确青枫动漫社招牌及摊位人群，新图不具备"
+  },
+  "items": [
+    {
+      "id": "001",
+      "file": "IMG_20260417_143433.png",
+      "source_photo": "IMG_20260417_143433.jpg",
+      "source_sha256": "0b3053edfd7d100cb843336848816b888b2e3bc6acf56a8a9b821a7eccbdc1f9",
+      "sha256": "e964c823ff91ab719257d94b106cf0eaf9cdd3cae58a475e8579d929963fb2a4",
+      "bytes": 4532525,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "002",
+      "file": "IMG_20260417_143434.png",
+      "source_photo": "IMG_20260417_143434.jpg",
+      "source_sha256": "ec1650c6ade774fdd9614d5db4ef6544cbce2c3b5841892b2224a8e087f36ef1",
+      "sha256": "747951ae098a82a400353be54b523a9b1077e5ed15d12ca25d35e3fd47d539fd",
+      "bytes": 4423197,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "003",
+      "file": "IMG_20260417_143507.png",
+      "source_photo": "IMG_20260417_143507.jpg",
+      "source_sha256": "f4e09ee63f655779768044353e94d46ebfde384d12b4438644b50131f4cbbb68",
+      "sha256": "ec75b49dde3b6c3162b112daae6316d5883a7bef21364677cceff5e03c3aa001",
+      "bytes": 4404658,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "004",
+      "file": "IMG_20260417_143509.png",
+      "source_photo": "IMG_20260417_143509.jpg",
+      "source_sha256": "5a42f415281ea72c620b215971cd19575c32236cc827b67272adcbbd85b976f3",
+      "sha256": "20bbe7b353b76651e61afdfceacaca99035f6b69ca891a4cc0e831fd5308648b",
+      "bytes": 4500116,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "005",
+      "file": "IMG_20260417_143524.png",
+      "source_photo": "IMG_20260417_143524.jpg",
+      "source_sha256": "701bf3db5c9ec91dda4160b47a9007010c30fa4d01a46d535a7a28a69d2f3f54",
+      "sha256": "81b1cf6f55bcd5efeaee8b3ffa0e370c2f8b68730e87ca736073513c09acab25",
+      "bytes": 4434077,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "006",
+      "file": "IMG_20260417_143528.png",
+      "source_photo": "IMG_20260417_143528.jpg",
+      "source_sha256": "d85b9294e28ebe144a4541c078609de107c6e38dc64e647ebdf4cc5dff6e7012",
+      "sha256": "320a3e2a3d99b72f4571063db35548a6cf2dad40b7929062ad58adbdf5156fcf",
+      "bytes": 4411578,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "007",
+      "file": "IMG_20260417_143826.png",
+      "source_photo": "IMG_20260417_143826.jpg",
+      "source_sha256": "3914dfd44b39bf0630b38748e2c1041f7409c32680ee2e3d366fa00e18248611",
+      "sha256": "3c0812115792ea758ecd3ff9f9b32adc8e28f3d0be2832cbb7bb8468f36b55f0",
+      "bytes": 4415837,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "008",
+      "file": "IMG_20260417_143907.png",
+      "source_photo": "IMG_20260417_143907.jpg",
+      "source_sha256": "e8b3ade4f0665afaeebea5c3ea1ddb77e3f27ec9ac2adb433649d33c58a01681",
+      "sha256": "7df04d5c800bdb99a21ae4b916789de7eceb124b158354f7d22ef5073d5101ba",
+      "bytes": 4393510,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "009",
+      "file": "IMG_20260417_143938.png",
+      "source_photo": "IMG_20260417_143938.jpg",
+      "source_sha256": "1beb8097afe39cb1753ec0f6d77214aa3d9afc15feb7c70a254683f7f99b04a8",
+      "sha256": "531911491ff4b594c99969c1878898a416d029456e10e7ae5bb43330bbba90fe",
+      "bytes": 4276057,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "010",
+      "file": "IMG_20260417_143939.png",
+      "source_photo": "IMG_20260417_143939.jpg",
+      "source_sha256": "59c02ed81184a56f94c324f515bf467bdcfebe33a0ad377678e1e0ad98023031",
+      "sha256": "53e67cbdd06c96da0d2eb389b993df6a50c4c692107e4fb9279ac9319adb80fd",
+      "bytes": 4468075,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "日间林荫道"
+    },
+    {
+      "id": "011",
+      "file": "IMG_20260418_161743.png",
+      "source_photo": "IMG_20260418_161743.jpg",
+      "source_sha256": "2eb43e0eafd2210246fcfc03875f3c9619443ccf1c95e5e1f89c95ec31833147",
+      "sha256": "df494aae239dc31a794468ca9ca71e58e585185152a85187f6eee1a35ae35170",
+      "bytes": 4391050,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "012",
+      "file": "IMG_20260418_161827.png",
+      "source_photo": "IMG_20260418_161827.jpg",
+      "source_sha256": "4e3561b806fe37663fb7988229a9b7c9715fe5209da7fe6dc83bb7d0dc124ea7",
+      "sha256": "5d021758da1f12090573c3c22b776cd5303898c4edd2240aedd6fe071dc9a6ab",
+      "bytes": 3693643,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "013",
+      "file": "IMG_20260418_162111.png",
+      "source_photo": "IMG_20260418_162111.jpg",
+      "source_sha256": "773baab13f521b83b73ef040cc867a298ba7c00ee289bfdb7edd1d868caf7521",
+      "sha256": "da2bc5e568d311248e12cf045facd90c83e701f3b985cc56dd5dd23253b33f23",
+      "bytes": 3197128,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "014",
+      "file": "IMG_20260418_162113.png",
+      "source_photo": "IMG_20260418_162113.jpg",
+      "source_sha256": "1fb1d68b363b9a5dde411cfcf7f4d1d06701733c8b202578e51dcd9562dc1c78",
+      "sha256": "2328a9ddc64f23799670107c694001e7080874fb6cc42ff4dc4f00fec25c6e28",
+      "bytes": 3434195,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "015",
+      "file": "IMG_20260418_162320.png",
+      "source_photo": "IMG_20260418_162320.jpg",
+      "source_sha256": "344a0565d7c829e326adcc2086aec1b65ec7b98536561ae1686d2bc67ec7a282",
+      "sha256": "a5a17b5bc1cd66e5863d09a42da2d064b8e2eedf58792d6adeb701ed27c66347",
+      "bytes": 3223555,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "016",
+      "file": "IMG_20260418_162322.png",
+      "source_photo": "IMG_20260418_162322.jpg",
+      "source_sha256": "d2447d824e614fad42b993869c8825d5755c55654e3d582136d43611a905bdb8",
+      "sha256": "f6fee7d213fcb90be7a3325fea51be8a45a660e9fd59f7b15294f26ee09332c5",
+      "bytes": 3286669,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "017",
+      "file": "IMG_20260418_162345.png",
+      "source_photo": "IMG_20260418_162345.jpg",
+      "source_sha256": "74a37bbe9a18af225d85af600d6ff7fe3d31ed10986bc5c24f535bd8188c9a35",
+      "sha256": "3050d45d5286d8363ddad0a9f1719d25f4de530876a891f69f9e2308e20e6c5f",
+      "bytes": 3185009,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "018",
+      "file": "IMG_20260418_162346.png",
+      "source_photo": "IMG_20260418_162346.jpg",
+      "source_sha256": "36f1ebca021df01e9bc7b03a94a0a279f85fb445585948525947b0c8c7a58247",
+      "sha256": "0a5ea7003374f8daeaa499f0e36d9e0878a3e26ecc5345d5c2b3cf02ba72b8e2",
+      "bytes": 3193913,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "019",
+      "file": "IMG_20260418_162410.png",
+      "source_photo": "IMG_20260418_162410.jpg",
+      "source_sha256": "02c05609786bfa8cd3de6d7213fced72c492fdf9e880bcfe9e50ea4d622984af",
+      "sha256": "87af14231188ed5137e7ac1198db45c343918c4fb395134c4af1634fa01b571a",
+      "bytes": 3073698,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "020",
+      "file": "IMG_20260418_162413.png",
+      "source_photo": "IMG_20260418_162413.jpg",
+      "source_sha256": "45f85a998318986587398e75b85f689f72e2a2e8d360729e27627b3b1f492d23",
+      "sha256": "49b0d55c683e3e85cfba6e39ac922b5044ac485019118e86f34b82264a9d6023",
+      "bytes": 2992132,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "021",
+      "file": "IMG_20260418_162415.png",
+      "source_photo": "IMG_20260418_162415.jpg",
+      "source_sha256": "031f451afd0f8671c15021e2b1096a5f846ece391507b3bfe9defae728b2579a",
+      "sha256": "6a0c47ad18a7ab3c1d4d56113790aa049bc8b42749512034f3c96828b8a22a1e",
+      "bytes": 2885623,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "022",
+      "file": "IMG_20260418_162418.png",
+      "source_photo": "IMG_20260418_162418.jpg",
+      "source_sha256": "a958d778cbf0c7cb3e7032bde13ddc7473826e81654210824cea7e6681b713fc",
+      "sha256": "22dd14e9aae2a7f28a7aee16dc6a647d9777023ef8ceed0627ad87b3d4b53458",
+      "bytes": 3178502,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "023",
+      "file": "IMG_20260418_162508.png",
+      "source_photo": "IMG_20260418_162508.jpg",
+      "source_sha256": "4f62005a3bb48b1a6c2c1ace69da470fb8013101e23039a67a1ff8e0210c652f",
+      "sha256": "cd3a33610fad268456309eb2c5fc038ac10be6c2ac9e679bab23b490a9f601e5",
+      "bytes": 3715141,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "024",
+      "file": "IMG_20260418_162521.png",
+      "source_photo": "IMG_20260418_162521.jpg",
+      "source_sha256": "fbc8f26de61ad1073f49636af492f4eb5520b7575811e7f53c371633de60c618",
+      "sha256": "812eb1e923cd26d3135c752c94652217581b51fd7156f373cdc4b29bd7c12ddc",
+      "bytes": 3770724,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "025",
+      "file": "IMG_20260418_162614.png",
+      "source_photo": "IMG_20260418_162614.jpg",
+      "source_sha256": "51726789fb47d87918ee95128ba156d44b311e29e940b98b347bfb6386299e5e",
+      "sha256": "847ff1055bc421f20cb9688eb66380c2c900c443a789cfe8c618bea0be95a390",
+      "bytes": 3666570,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "026",
+      "file": "IMG_20260418_165942.png",
+      "source_photo": "IMG_20260418_165942.jpg",
+      "source_sha256": "2e5c749b47fefdad4edfb1b07ddb4d597f4b588fb71c4b75791f17c0250234e3",
+      "sha256": "53523810094ecf183f2b071ab8f61a90ea5104910664a489124cb2aad0ec5077",
+      "bytes": 3921349,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "027",
+      "file": "IMG_20260418_170017.png",
+      "source_photo": "IMG_20260418_170017.jpg",
+      "source_sha256": "24d39023896c67981125d96fc71dec8ca7819576a1bd5cec7377b0c0b8a387a1",
+      "sha256": "7e1cac37393ee9a0d0c6cc1fc1b5ee07f8cb0d36c49099cb1343fb0022558c0b",
+      "bytes": 3701563,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "028",
+      "file": "IMG_20260418_170018.png",
+      "source_photo": "IMG_20260418_170018.jpg",
+      "source_sha256": "81cbcc0ab9db74fe693aa867647037baf7b94fd2ae2bf9491e542b1e7af4fef0",
+      "sha256": "ec66d3b0b0f7becef024f52426043ef578ddbc940e9ede2cee70c755acf914a0",
+      "bytes": 3887893,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "029",
+      "file": "IMG_20260418_170053_1.png",
+      "source_photo": "IMG_20260418_170053_1.jpg",
+      "source_sha256": "3414673a83c5cddd0d899a489ea9330fa92809e9f340aa39a02df3845dd91a5b",
+      "sha256": "c95b86fa65b4d339dc106d7ca16bfe9efbd8c1ec6163e7aaf365d449f919929b",
+      "bytes": 4031608,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "030",
+      "file": "IMG_20260418_170053.png",
+      "source_photo": "IMG_20260418_170053.jpg",
+      "source_sha256": "8fa145bb1e00c054e0f7ffa4d3b22f739aa9c970b0d6e5ffc61b1e84f84293f8",
+      "sha256": "a5be9e2becf472ae5721d7170b96a6597283b7b599fdf90e867bc93dd57f9978",
+      "bytes": 4019676,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "白天操场与招新帐篷"
+    },
+    {
+      "id": "031",
+      "file": "IMG_20260418_192728.png",
+      "source_photo": "IMG_20260418_192728.jpg",
+      "source_sha256": "cd5d3034e18cae68df5c6dfec0ae2e8d5e6b721930299989a17fec2a6d4f0c34",
+      "sha256": "b91165d0ce5babc6a25bc57128458662f58910ac1e7897b76d1b926d3d9608a4",
+      "bytes": 3286356,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭入口"
+    },
+    {
+      "id": "032",
+      "file": "IMG_20260418_192741.png",
+      "source_photo": "IMG_20260418_192741.jpg",
+      "source_sha256": "a0f6f46d453a9798c2931465e859f79fc09b8b27210c825a2c8a3943e487971c",
+      "sha256": "c77fdc5bca015a8744a52c9e16f115277cbc16805b898ec5b0c60dde94b62763",
+      "bytes": 3319884,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭入口"
+    },
+    {
+      "id": "033",
+      "file": "IMG_20260418_192900.png",
+      "source_photo": "IMG_20260418_192900.jpg",
+      "source_sha256": "33aa7489881a0977cfe05cee705c1036292295aa629cc58de4b39a5e43e138be",
+      "sha256": "6639046db782336f5a9573f88e61275a933ee27ce5494221ee60f6f53c198602",
+      "bytes": 2972093,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "034",
+      "file": "IMG_20260418_192927.png",
+      "source_photo": "IMG_20260418_192927.jpg",
+      "source_sha256": "5f0798ab6eb8b702ffab8ea4981447ffe1ae8c78b8bbd4dd416262cb7b2d96ae",
+      "sha256": "1d378eec63a9c77044d7b702ccd2baf32c96e81a0666ecde0416d8308d949944",
+      "bytes": 3515808,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "035",
+      "file": "IMG_20260418_192935.png",
+      "source_photo": "IMG_20260418_192935.jpg",
+      "source_sha256": "4d84d2d7a62e5fe96283e09b1873f09b569b635cdfbb5c84bd9c40d4692a7239",
+      "sha256": "250f87d0fd777c79607116c8bdaa61696fef0c7cba05e15d8cb16f35fa35d312",
+      "bytes": 3424267,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "036",
+      "file": "IMG_20260418_192945.png",
+      "source_photo": "IMG_20260418_192945.jpg",
+      "source_sha256": "9abc84c45cfead2debdf56ce91e4fc523d1c7d27ea7c0cb1e49af86e5ef3bfb4",
+      "sha256": "b0518644e8e343e42a08adbd0f3c221b5347b30085a768c65080276ac19fdddb",
+      "bytes": 3336151,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "037",
+      "file": "IMG_20260418_193135.png",
+      "source_photo": "IMG_20260418_193135.jpg",
+      "source_sha256": "1f24bfe19e568fc5a5d0f1f4fe290bac28cfaa273e18dedf4a4a56138817926e",
+      "sha256": "66ec0c27cfdfb00f797641b85a8f220bb7c0268ade1f18cc26c7adbeff873272",
+      "bytes": 3404510,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "038",
+      "file": "IMG_20260418_193138.png",
+      "source_photo": "IMG_20260418_193138.jpg",
+      "source_sha256": "9348140e6b16a3c952bd4bfd6218a652ad0fa79ad1a2c9225d048c4e5b1aeb0c",
+      "sha256": "666ea9098707b739c04dce6730d130cdfdc619650f5b796a16a5e19bf7063b7e",
+      "bytes": 3553390,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "039",
+      "file": "IMG_20260418_193148.png",
+      "source_photo": "IMG_20260418_193148.jpg",
+      "source_sha256": "55797e51ccfa485231b152c130b063f614ff0697c3984c0212a831c05b9781b2",
+      "sha256": "a1c88f91f4b4dcaf9567ec40fc40d5a427df7122a9c9e0cad6eafd2b9321dee2",
+      "bytes": 3290220,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "040",
+      "file": "IMG_20260418_193156.png",
+      "source_photo": "IMG_20260418_193156.jpg",
+      "source_sha256": "f6ed6912be91c26058492274696329337bc2487e706cb726c5e04eb837386737",
+      "sha256": "5c8c7b2b6596fde170db01d28634e76bd032be04340811d8ed78ff554ee497f2",
+      "bytes": 3298289,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教学楼侧向中庭"
+    },
+    {
+      "id": "041",
+      "file": "IMG_20260418_193348.png",
+      "source_photo": "IMG_20260418_193348.jpg",
+      "source_sha256": "52454a0269ddf1dd5bd06c0e827c854b1029c2d06000377e7b95a9d82b0a8a9e",
+      "sha256": "35e77258873793f5eedf8becb19780e87465986bd23a6f583f4a06929d91bbfe",
+      "bytes": 3245877,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "大厅展板与电子屏"
+    },
+    {
+      "id": "042",
+      "file": "IMG_20260418_193350.png",
+      "source_photo": "IMG_20260418_193350.jpg",
+      "source_sha256": "a4f56aa6a6496e6c3e6f7579b436c30767127f6a46f51a7b2fa80ebf45b8d972",
+      "sha256": "8f15a2ed36ae3d10a8aab9ab1fd3a500de1301e092024784fa2375a64cd12c48",
+      "bytes": 3322823,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "大厅展板与电子屏"
+    },
+    {
+      "id": "043",
+      "file": "IMG_20260418_193401.png",
+      "source_photo": "IMG_20260418_193401.jpg",
+      "source_sha256": "40b378dcb00fe65fe90c6ce1c4e7d7ea22cde989fdd479836c576fbca3595575",
+      "sha256": "fd6e83867cff2e4a7336cc60cceec36fc75afbb637a5efa477337dbeb3312b42",
+      "bytes": 3201792,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "大厅展板与电子屏"
+    },
+    {
+      "id": "044",
+      "file": "IMG_20260418_193407.png",
+      "source_photo": "IMG_20260418_193407.jpg",
+      "source_sha256": "2811da5abf690df1f1f429b54b517cad4ad4f4ecea6fac806eff5726e68bd1ce",
+      "sha256": "563ac123a71feb6a183c8a600d13cee82ce5bad04eb700bd144d66698e372cc8",
+      "bytes": 2987987,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "大厅展板与电子屏"
+    },
+    {
+      "id": "045",
+      "file": "IMG_20260418_193410.png",
+      "source_photo": "IMG_20260418_193410.jpg",
+      "source_sha256": "6fd1e23af5a27438ea9d390220d813a7b21d64ce9b279afbed1109dd7b06bf0b",
+      "sha256": "7eff98fcbb252db1b89b259867e3af6bb887d6d05cea51981c9277511217ea34",
+      "bytes": 3258289,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "大厅展板与电子屏"
+    },
+    {
+      "id": "046",
+      "file": "IMG_20260418_193618.png",
+      "source_photo": "IMG_20260418_193618.jpg",
+      "source_sha256": "e128842a1dcbf8ab726b209013c67d400c6f26d290ec87ec6698819038ecba0f",
+      "sha256": "ad7732bf465453b930a7eb0061f527c29e3ec98fd66813634588571ad3c1e1aa",
+      "bytes": 3094600,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "047",
+      "file": "IMG_20260418_193620.png",
+      "source_photo": "IMG_20260418_193620.jpg",
+      "source_sha256": "b14f1b3c34e3d5c5885dc1f20da5efc69a98310337f93022dba04b215d5a475d",
+      "sha256": "d7800bf70746d39e76f98503ac35f0d29ebe614d95cdc71f6ee042820fda78a8",
+      "bytes": 3017093,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "048",
+      "file": "IMG_20260418_193637.png",
+      "source_photo": "IMG_20260418_193637.jpg",
+      "source_sha256": "d2cde6cdde2a6761735ed40d5eb70f3734e891f39056ecdeace1446654faf09b",
+      "sha256": "828a2acfff9d335364320255338d64bf126bf6121100397e15e889b32da156af",
+      "bytes": 2973187,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "049",
+      "file": "IMG_20260418_193641.png",
+      "source_photo": "IMG_20260418_193641.jpg",
+      "source_sha256": "d59571d2d7caa871a41cdd2eee8bf86cb050725614f5fb3641e321a2a93f3e5c",
+      "sha256": "3e117790f88d68e339097962c6ddfa0c295cb7ecd144cc82c46c6e07d0b1794a",
+      "bytes": 3021266,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "050",
+      "file": "IMG_20260418_193703.png",
+      "source_photo": "IMG_20260418_193703.jpg",
+      "source_sha256": "4510eb2b6ee088fd44881e2235ad77ed4d5e7bdd619d76f895e15fe36c36be7b",
+      "sha256": "346b33f4aeb37101d93c8cf4a69fd78358c898f5dd03014cfd565fc99fd7eab8",
+      "bytes": 3033481,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "051",
+      "file": "IMG_20260418_193723.png",
+      "source_photo": "IMG_20260418_193723.jpg",
+      "source_sha256": "457ae5597c3cb02dc84b0f5636b34def7afc4dfee4776394045bd77ba91412c4",
+      "sha256": "fd96512c00ab610315611c6d7a57440f0335f9ee0f6a2b120f4b9f884d61a81e",
+      "bytes": 2890637,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "052",
+      "file": "IMG_20260418_193746.png",
+      "source_photo": "IMG_20260418_193746.jpg",
+      "source_sha256": "45156abacfc7ad61a585f645a66ad5253e6a447a0dce913b597d06daabf25853",
+      "sha256": "11270d0ce1bba6939ba97f8f4d6860a456ee6efb7051397e440a3504f9817e89",
+      "bytes": 3214980,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "053",
+      "file": "IMG_20260418_193751.png",
+      "source_photo": "IMG_20260418_193751.jpg",
+      "source_sha256": "d1bc4b6c3b94483dfc2885b229ce2543526a3451263decad1e573f768d42d0b6",
+      "sha256": "19c46ae0bbb3fa05202571279bbb54b9ef38e343449523d291f21fc86f2e9aff",
+      "bytes": 3152015,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "054",
+      "file": "IMG_20260418_193841.png",
+      "source_photo": "IMG_20260418_193841.jpg",
+      "source_sha256": "b130655d2c598b91a4b41438fcd97141a497c7610260751c254a9ec928631902",
+      "sha256": "89b3f2323d6175315efba190c66fd656a7e9d5ae40a8d11cc5c8d8977f1781b3",
+      "bytes": 3229647,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "055",
+      "file": "IMG_20260418_193848.png",
+      "source_photo": "IMG_20260418_193848.jpg",
+      "source_sha256": "a539e7ff2610cef2ec240a5e5b9f77d0923f0d307bb721098bb488c3a3bd28eb",
+      "sha256": "2c288c68718dd4a801ff5284f224b235dc82a5f2eb0981b93ea56f43f60410ee",
+      "bytes": 3146861,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "中庭另一朝向与长轴"
+    },
+    {
+      "id": "056",
+      "file": "IMG_20260418_194119.png",
+      "source_photo": "IMG_20260418_194119.jpg",
+      "source_sha256": "80af44b8c9e66f8b0f4e556865ddcb5cb19bb7b13fe89121b3a8ade3465d8ce5",
+      "sha256": "6efb47871311c97af031a02df6a123b2ec7c0a55c8968d9784ea18e56fc9c8dc",
+      "bytes": 3829884,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间校园道路"
+    },
+    {
+      "id": "057",
+      "file": "IMG_20260418_194136.png",
+      "source_photo": "IMG_20260418_194136.jpg",
+      "source_sha256": "bb0aba505f89808fd4fbe11f440d9aa2c6836de370f0bff03abd7017715e7aaf",
+      "sha256": "709461a1769f227b18934ca3d5c408e72815818284c1aede6c8aafa422a68d8f",
+      "bytes": 3936389,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间校园道路"
+    },
+    {
+      "id": "058",
+      "file": "IMG_20260418_194202.png",
+      "source_photo": "IMG_20260418_194202.jpg",
+      "source_sha256": "427da47751858d51c6de9a17720fc3b0ad75ccee596aa9d98b56085a61dddae3",
+      "sha256": "9a7e290f1ed4331d7b4130373fde7406b452d8002307e2ad4e9005a9f1459770",
+      "bytes": 4054074,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间校园道路"
+    },
+    {
+      "id": "059",
+      "file": "IMG_20260418_194209.png",
+      "source_photo": "IMG_20260418_194209.jpg",
+      "source_sha256": "c47d8e95c4ba9167907fc006c0216be817b40774f1b3ed65b1a68c3d5b52ec1a",
+      "sha256": "e23b21a334cce2126ed7fcb2e93bd55adf21251b3ffcde3acbb1acffdc1baa26",
+      "bytes": 3972495,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间校园道路"
+    },
+    {
+      "id": "060",
+      "file": "IMG_20260418_194215.png",
+      "source_photo": "IMG_20260418_194215.jpg",
+      "source_sha256": "ebe56b9f42828280b3eb05e7dadb99040dfc78e0562b0d9f2730cb4dc2fee9e1",
+      "sha256": "0394e2039dccb788e8d68beabab4d3a2c922b47a3a2b63070831299620886524",
+      "bytes": 3847989,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间校园道路"
+    },
+    {
+      "id": "061",
+      "file": "IMG_20260418_194438.png",
+      "source_photo": "IMG_20260418_194438.jpg",
+      "source_sha256": "0c03824f2d5300e8b717395516b1c7009be0a429df2c84a73378257e73c88217",
+      "sha256": "86cb299af2e6192898aa6a9ced419e7df77246dfe6fa3dd205222bbf4ad65226",
+      "bytes": 3411785,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间教学楼前"
+    },
+    {
+      "id": "062",
+      "file": "IMG_20260418_194441.png",
+      "source_photo": "IMG_20260418_194441.jpg",
+      "source_sha256": "da6d1ab4b99e80acf9e044d68f319f329eb2a82030f688a2e3110ee06264cb3e",
+      "sha256": "0d45737a3a5be0aee479c7d1a62ac322afddaa5c87601aa27cb0e2123b191db9",
+      "bytes": 3146590,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间教学楼前"
+    },
+    {
+      "id": "063",
+      "file": "IMG_20260418_194453_1.png",
+      "source_photo": "IMG_20260418_194453_1.jpg",
+      "source_sha256": "cc6404aa0b763145ec08ac571515d622c74c76fdcfd69ab52884517cf126cccb",
+      "sha256": "1a62f2ba41a326bc7ba9de8f35d06b0163c8f31c206331970026b692a347f88e",
+      "bytes": 3363243,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间教学楼前"
+    },
+    {
+      "id": "064",
+      "file": "IMG_20260418_194453.png",
+      "source_photo": "IMG_20260418_194453.jpg",
+      "source_sha256": "59b6f80c062c94a62e46ebe3762b5dc7380dfa0a837df91b3fc3d5cd3e22b798",
+      "sha256": "10f96f447741087797fcc213c112357584586d0a7e3ae004ff1d53e36890694d",
+      "bytes": 3185332,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间教学楼前"
+    },
+    {
+      "id": "065",
+      "file": "IMG_20260418_194532.png",
+      "source_photo": "IMG_20260418_194532.jpg",
+      "source_sha256": "7a3b5170a651e6d22a570fa817cc37b24d5886cc212d9fe9a9d91e317fda5fe5",
+      "sha256": "b84dec4a91f852cd2391cfca62751264dd1361f45210ce3474d4de49be252327",
+      "bytes": 3700132,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "066",
+      "file": "IMG_20260418_194542.png",
+      "source_photo": "IMG_20260418_194542.jpg",
+      "source_sha256": "5b6782d6878b1c4c94cdb95bc941a44b19aede7eab9a08c0a5e2cb54807d1314",
+      "sha256": "165e52d3e2bfe49fd8c5a4de8cd3c146b2f1e2fef53a1baaa781be6279c06dc2",
+      "bytes": 3397141,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "067",
+      "file": "IMG_20260418_194627.png",
+      "source_photo": "IMG_20260418_194627.jpg",
+      "source_sha256": "0d94c661966e0e180db246c00c5276e7007bb31c89a366f9ff9c0b96e0859434",
+      "sha256": "9d38244a527804173512338c993ada4c95a092e3a6ca2c047d1cdb3f418fca40",
+      "bytes": 3363381,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "068",
+      "file": "IMG_20260418_194633.png",
+      "source_photo": "IMG_20260418_194633.jpg",
+      "source_sha256": "e10ab1e1da2b6a39a7e656ede8964811d4c6f02c11b0b0ee520a74595acf39c0",
+      "sha256": "ed40515d3fc50755fff1213bec7fd40f76417405fe025b215694dd141605e89c",
+      "bytes": 3517865,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "069",
+      "file": "IMG_20260418_194638.png",
+      "source_photo": "IMG_20260418_194638.jpg",
+      "source_sha256": "ee0606e5ac6dca874dd908535311eb1d912fe035a06a85dea66a161d51961eda",
+      "sha256": "2432d2f276b5bd59161c4a774ba2b110254a1c8638f4dc988e2da733ee954c17",
+      "bytes": 3667470,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "070",
+      "file": "IMG_20260418_194706.png",
+      "source_photo": "IMG_20260418_194706.jpg",
+      "source_sha256": "e04050c98efe3aa8b39652253f19f13c6c085a06fdea934fcd63fa26b466f4dc",
+      "sha256": "ce64f94a1c031d937359d67f4e8ced0808f3605575bbd3d621ed69fa22d94fc3",
+      "bytes": 3746687,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "071",
+      "file": "IMG_20260418_194708.png",
+      "source_photo": "IMG_20260418_194708.jpg",
+      "source_sha256": "0a6e865bb3fd32ca2ff0f2e83c94b5170d58f6a352a6cca1b3bfc2e15362e57a",
+      "sha256": "c9536f24fcde2ff1364d783171f630bb66efdf46799f0a79601c9de800af7d5f",
+      "bytes": 3906652,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "072",
+      "file": "IMG_20260418_194725.png",
+      "source_photo": "IMG_20260418_194725.jpg",
+      "source_sha256": "ecd7810ba4d74c754b2f93a50f8990bc2e1c89ddbbdb73882f7c8fcd332da5a9",
+      "sha256": "c0d73ebe956e1ba5516142d39ecbbf1a7210ac3dd7d01c750a379e5f34766e0f",
+      "bytes": 3840097,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "073",
+      "file": "IMG_20260418_194727.png",
+      "source_photo": "IMG_20260418_194727.jpg",
+      "source_sha256": "e7d1c8b361367bf4b5bf6435f41f2ce9cf6ad060b3c6dbc3dff5b2d50c709745",
+      "sha256": "5a3f59b1d8f547b9c6c4998d9d4187d4d9ec78574d2501666d0efbe1d0822783",
+      "bytes": 3741925,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "夜间林荫路与车辆"
+    },
+    {
+      "id": "074",
+      "file": "IMG_20260418_195414.png",
+      "source_photo": "IMG_20260418_195414.jpg",
+      "source_sha256": "22cec054aa0efa1471cadbfb2acc6ab1b5db0ddb299ae88406d7c80fe4295400",
+      "sha256": "05f04e647af18c8cea701ca53db60a5d5c6f83db6a3230b7ce5b29711d87644b",
+      "bytes": 2387848,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "075",
+      "file": "IMG_20260418_195418.png",
+      "source_photo": "IMG_20260418_195418.jpg",
+      "source_sha256": "e3386190872bf869ad08895d9ab152daf88ec9f6a97e6765f39c3d17d86b2ddf",
+      "sha256": "f49a52bc8a1f41459c56cddbd7d808465a64c30d6ca9a478824a72733faa262c",
+      "bytes": 2416409,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "076",
+      "file": "IMG_20260418_195451.png",
+      "source_photo": "IMG_20260418_195451.jpg",
+      "source_sha256": "0abd049f04d9d4decc16ffe70ef08bad1007f40dfad490d4972d00c82c2fa78d",
+      "sha256": "159fd36998d2a96ef55f80a02a33c88466bd76ddc7c1c641b9196760fc2587db",
+      "bytes": 2507902,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "077",
+      "file": "IMG_20260418_195459.png",
+      "source_photo": "IMG_20260418_195459.jpg",
+      "source_sha256": "f53c30192b4463b7b61bdb02872f3ab24b2e4677d23111f6b0213a47917aea0f",
+      "sha256": "606258d8e8ca889317c4f5a1ff0e2159d65a65f549f11500cf58ab77f474a92a",
+      "bytes": 2443183,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "078",
+      "file": "IMG_20260418_195626.png",
+      "source_photo": "IMG_20260418_195626.jpg",
+      "source_sha256": "0cdc4b0e568f095d1e2121f8b7f1905cbcc19b7f7a35311b1aa3433998b16fdd",
+      "sha256": "314e45af94909d9fbd0ed3396db4caa1da6920bc9dbfeee8b755597d1466752d",
+      "bytes": 2513278,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "079",
+      "file": "IMG_20260418_195636.png",
+      "source_photo": "IMG_20260418_195636.jpg",
+      "source_sha256": "ea18a80acc72647713809f5d020e66b5a633d0bcda98e23c4c2b1315d7eb839f",
+      "sha256": "75831765370715f5ddc20e3200fbdc94a8f0a9d55d24849ab5e1ec1d9ffed2fb",
+      "bytes": 2541648,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "080",
+      "file": "IMG_20260418_195638.png",
+      "source_photo": "IMG_20260418_195638.jpg",
+      "source_sha256": "86f0e539d2ad3b13304dd93c6d39bd38fecfcbaf59d499338b8c9c152ab02612",
+      "sha256": "41f51fa8b1e9d937ef38940f2ef29ff0aea0b058ac56146ff0061d07e1dec859",
+      "bytes": 2577847,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "081",
+      "file": "IMG_20260418_195641.png",
+      "source_photo": "IMG_20260418_195641.jpg",
+      "source_sha256": "a1f575a8a6187766affaa50a5e92bb6e527b0f32bdb2b5f95b4a1dc9d15e1955",
+      "sha256": "e0a579fc81eec889a42fd956ad11485dab9e78986ca78754a158442eed2789d9",
+      "bytes": 2434983,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "082",
+      "file": "IMG_20260418_195648.png",
+      "source_photo": "IMG_20260418_195648.jpg",
+      "source_sha256": "8d5b1f03be658e3d76c4b3015b078dc94de52f513f392beb18f5bc580a9bf208",
+      "sha256": "c98168e044ec26d2463bc5fd58562e6c6bce0378a3d13ac9d19df252da69d1d2",
+      "bytes": 2493522,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "083",
+      "file": "IMG_20260418_195651.png",
+      "source_photo": "IMG_20260418_195651.jpg",
+      "source_sha256": "ad51da9a35f8b3b2844029abe6d35770bd746128254774b026759cc9ae2c5824",
+      "sha256": "1f7dc7f62dbba441fdc6642784786b923389bd919a0db6e62fea05da426dfddd",
+      "bytes": 2433403,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "084",
+      "file": "IMG_20260418_195653.png",
+      "source_photo": "IMG_20260418_195653.jpg",
+      "source_sha256": "6203cbeba0c94e6973a962084ab661ffadf9eef30cb6f0babdc43cfbfd090f42",
+      "sha256": "c0758c28e8f69797f4d43dbaf911a59c1aeb690a64c218e3b6fdd7bd888045e0",
+      "bytes": 2324899,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室前向"
+    },
+    {
+      "id": "085",
+      "file": "IMG_20260418_195711.png",
+      "source_photo": "IMG_20260418_195711.jpg",
+      "source_sha256": "1b38ed750f637f5b46dd1f7d74963722acf2c228bcefe547c0b920ba29a52bcf",
+      "sha256": "61ceaed8915de7768040bcaeac8cede5d22d9d99903c8439bcd50059275515b0",
+      "bytes": 2317949,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室后向"
+    },
+    {
+      "id": "086",
+      "file": "IMG_20260418_195721.png",
+      "source_photo": "IMG_20260418_195721.jpg",
+      "source_sha256": "64969126e0c46b25442076db44d2f207c8c02415b84a85097df1b654f44f6bca",
+      "sha256": "18e67ac9945feae665dea1b17d43cac5657af64999136d42f672814024a9c384",
+      "bytes": 2442049,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室后向"
+    },
+    {
+      "id": "087",
+      "file": "IMG_20260418_195731.png",
+      "source_photo": "IMG_20260418_195731.jpg",
+      "source_sha256": "111643bcdb580994f8d99a83641301047e343c83ede2ab20ffb714d08153a6ad",
+      "sha256": "18c1e01d4b00f42be90f34a84c21b06327f014640cffdb5ef124305197b1cb1c",
+      "bytes": 2319750,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室后向"
+    },
+    {
+      "id": "088",
+      "file": "IMG_20260418_195738.png",
+      "source_photo": "IMG_20260418_195738.jpg",
+      "source_sha256": "7f8f53b01f3d9d80ceec75bbcbd93d2c49af92fe10465d5ef5ac1d5943aaeeb2",
+      "sha256": "9ee401048208af3f8ea3da55f943737147883cc78246f64de082b7c7e207a360",
+      "bytes": 2437610,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室后向"
+    },
+    {
+      "id": "089",
+      "file": "IMG_20260418_195741.png",
+      "source_photo": "IMG_20260418_195741.jpg",
+      "source_sha256": "c46fbcfda4b45925934a648db87387ff80896d2725fa1effc8795a1838e34037",
+      "sha256": "201a2ae5bcca964ebbccf1b11a65b27b122726ac89bb38f4fdc6b57d82e666ee",
+      "bytes": 2538928,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室后向"
+    },
+    {
+      "id": "090",
+      "file": "IMG_20260418_195754.png",
+      "source_photo": "IMG_20260418_195754.jpg",
+      "source_sha256": "d4bf6fefd9461b93a18eef513d183a1e0ac47e42aac7d3eab21c046a414b3bfa",
+      "sha256": "0554de19e1866da24bb39f2e746461ff660309fcbcfa8ffc128b67055ce2dd8d",
+      "bytes": 2545394,
+      "size": [
+        2048,
+        1152
+      ],
+      "category": "教室后向"
+    }
+  ]
+}

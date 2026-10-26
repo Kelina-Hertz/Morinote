@@ -8,6 +8,9 @@ define scene_zoom = 1.26
 define scene_yanchor = 0.5
 define scene_ypos = 400
 
+# Campus replacements and source mapping: docs/campus-backgrounds.md.
+# Native 2048x1152 art fills the 1920x1080 canvas without the old zoom/crop.
+# Story-specific backgrounds without a matching campus photograph stay original.
 image goko:
     "gui/scene/goko1.png"
     zoom scene_zoom
@@ -23,161 +26,25 @@ image phone_scene:
     zoom scene_zoom
     yanchor scene_yanchor
     ypos scene_ypos
-image block:
-    "gui/scene/block1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch:
-    "gui/scene/westcorch2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch_l:
-    "gui/scene/westcorch4.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch_r:
-    "gui/scene/westcorch1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch2:
-    "gui/scene/westcorch3.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
 image qf:
     "gui/scene/qf.png"
     zoom scene_zoom
     yanchor scene_yanchor
     ypos scene_ypos
-image block_n1:
-    "gui/scene/block_n1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image block_n2:
-    "gui/scene/block_n2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room1:
-    "gui/scene/classroom1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room2:
-    "gui/scene/classroom2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room3:
-    "gui/scene/classroom3.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room4:
-    "gui/scene/classroom4.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image w12_1:
-    "gui/scene/west12_3.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image w12_2:
-    "gui/scene/west12_2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image goko:
-    "gui/scene/goko1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image domitory:
-    "gui/scene/domitory.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image phone_scene:
-    "gui/phone_scene.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image block:
-    "gui/scene/block1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch:
-    "gui/scene/westcorch2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch_l:
-    "gui/scene/westcorch4.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch_r:
-    "gui/scene/westcorch1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image westcorch2:
-    "gui/scene/westcorch3.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image qf:
-    "gui/scene/qf.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image block_n1:
-    "gui/scene/block_n1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image block_n2:
-    "gui/scene/block_n2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room1:
-    "gui/scene/classroom1.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room2:
-    "gui/scene/classroom2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room3:
-    "gui/scene/classroom3.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image room4:
-    "gui/scene/classroom4.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image w12_1:
-    "gui/scene/west12_3.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
-image w12_2:
-    "gui/scene/west12_2.png"
-    zoom scene_zoom
-    yanchor scene_yanchor
-    ypos scene_ypos
+
+image block = Transform("gui/scene/campus/IMG_20260417_143507.png", xysize=(1920, 1080))
+image westcorch = Transform("gui/scene/campus/IMG_20260418_162320.png", xysize=(1920, 1080))
+image westcorch_l = Transform("gui/scene/campus/IMG_20260418_162614.png", xysize=(1920, 1080))
+image westcorch_r = Transform("gui/scene/campus/IMG_20260418_161743.png", xysize=(1920, 1080))
+image westcorch2 = Transform("gui/scene/campus/IMG_20260418_161827.png", xysize=(1920, 1080))
+image block_n1 = Transform("gui/scene/campus/IMG_20260418_194119.png", xysize=(1920, 1080))
+image block_n2 = Transform("gui/scene/campus/IMG_20260418_194725.png", xysize=(1920, 1080))
+image w12_1 = Transform("gui/scene/campus/IMG_20260418_194453_1.png", xysize=(1920, 1080))
+image w12_2 = Transform("gui/scene/campus/IMG_20260418_192935.png", xysize=(1920, 1080))
+image room1 = Transform("gui/scene/campus/IMG_20260418_195653.png", xysize=(1920, 1080))
+image room2 = Transform("gui/scene/campus/IMG_20260418_195651.png", xysize=(1920, 1080))
+image room3 = Transform("gui/scene/campus/IMG_20260418_195754.png", xysize=(1920, 1080))
+image room4 = Transform("gui/scene/campus/IMG_20260418_195721.png", xysize=(1920, 1080))
 
 image black = "#000000"
 image white = "#ffffff"

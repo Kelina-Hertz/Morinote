@@ -216,7 +216,7 @@ style ova_back_button_text is button_text:
 
 
 screen ova_nvl(dialogue, items=None):
-    add "gui/scene/classroom1.png"
+    add "room1"
     add Solid("#f4f7f2f2")
     add Solid("#22a9c2") xsize 14 ysize 1080
     

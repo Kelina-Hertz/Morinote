@@ -185,7 +185,7 @@ testsuite ui_qa:
         assert eval (ova_is_completed("test_OVA"))
 
 label _qf_qa_scene:
-    scene expression "gui/scene/classroom1.png"
+    scene block
     show duou
     $ quick_menu = True
     $ _qf_qa_choice = 0
@@ -198,12 +198,12 @@ label _qf_qa_scene:
         "等一会儿再做决定。":
             $ _qf_qa_choice = 3
     duou "你选择了较长的选项。"
-    scene expression "gui/scene/block_n1.png"
+    scene block_n1
     duou "夜间阅读检查：浅色底板保持文字清晰，轻透的叶印只留在边缘。"
     return
 
 label _qf_qa_save_scene:
-    scene expression "gui/scene/classroom1.png"
+    scene room1
     show duou
     $ quick_menu = True
     $ _qf_qa_marker = 1
