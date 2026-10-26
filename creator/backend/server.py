@@ -35,6 +35,7 @@ class Service:
         self.preview = PreviewManager(self.engine, '', token, self.runtime_edit)
         self.project_session = uuid.uuid4().hex
         self._read_cache = None
+        self.ai_tasks = None
 
     def read_snapshot(self):
         """Read-only consumers share one descriptor parse, keyed by disk identity."""
@@ -60,6 +61,8 @@ class Service:
             raise ValueError('项目已切换，请刷新当前项目。旧请求未执行。')
 
     def select_project(self, root):
+        if self.ai_tasks:self.ai_tasks.stop()
+        self.ai_tasks=None
         self.preview.stop()
         self.preview.session=None
         self.preview.events=[]
@@ -123,6 +126,26 @@ class Service:
 
     def dispatch(self, route, body):
         self.check_session(body.get('projectSession'))
+        if route.startswith('/api/ai/'):
+            from backend.ai_tasks import AITasks
+            if self.ai_tasks is None:self.ai_tasks=AITasks(self.current(),self.engine)
+            tasks=self.ai_tasks; action=route.removeprefix('/api/ai/');tid=body.get('taskId')
+            if action=='new':return tasks.new(body['prompt'],body['state'],body.get('context',{}))
+            if action=='list':return {'tasks':tasks.list()}
+            if action=='diff':return tasks.diff(tid,body.get('state'))
+            if action=='prepare':return tasks.prepare_apply(tid,body['reviewHash'],body['state'])
+            if action=='rebase':return tasks.rebase(tid,body['state'],body.get('resolutions'))
+            if action=='mark':return tasks.mark(tid,body['values'])
+            if action=='tool':
+                preview=tasks.preview(tid)
+                if body.get('bridge'):
+                    preview.address=body['bridge']['address'];preview.token=body['bridge']['token']
+                return tasks.tool(tid,body['name'],body.get('args',{}),body['callId'])
+            if action=='execution':return tasks.finish_execution(tid,body['id'],body['code'])
+            if action=='terminal':return tasks.terminal(tid,body['payload'])
+            if action=='bridge':return tasks.bridge(tid,body['operation'],body.get('payload',{}))
+            if action=='stop':tasks.stop();return {'stopped':True}
+            raise ValueError('未知 AI 接口。')
         if route == '/api/workspace/barrier':
             # POST dispatch already holds service.lock, including the entire
             # source save. This is only a completion barrier, never a save.
@@ -136,7 +159,7 @@ class Service:
                 disk = workspace.read_document(root, body['path'])
                 if disk['hash'] != body['diskHash'] or disk['exists'] != body.get('diskExists', True):
                     raise ValueError('磁盘文件又发生了变化，请重新比较。')
-                return {**merge(body['base'], body['local'], disk['content']), 'disk': disk}
+                return {**merge(body['base'], body['local'], body.get('incoming',disk['content'])), 'disk': disk}
             if route.endswith('/save-recovery-ack'):
                 from backend.source_transactions import acknowledge
                 acknowledge(root, body['ids'])
@@ -147,7 +170,11 @@ class Service:
                 return actor_source(root,candidate,body.get('nodeId'),body.get('tag'),body.get('documents'))
             if route.endswith('/analyze'):
                 candidate=workspace.projection(root,project,body.get('documents',[]),ide=body.get('ide'))
-                return {'config':native_config.catalog(root,candidate,body.get('documents')), 'flow':native_flow.graph(root,candidate,body.get('documents')), 'project':candidate}
+                result={'config':native_config.catalog(root,candidate,body.get('documents')), 'flow':native_flow.graph(root,candidate,body.get('documents')), 'project':candidate}
+                if body.get('validate'):
+                    from backend.project import validate_project
+                    result['diagnostics']=validate_project(candidate,root)
+                return result
             if route.endswith('/prepare'):
                 adapter = {'config':native_config, 'flow':native_flow, 'stage':native_stage, 'assets':native_assets}.get(body['adapter'])
                 if not adapter:raise ValueError('未知原生编辑器。')
@@ -546,8 +573,8 @@ def create_server(service, port):
                 return self.send({'error': '未授权的本机请求。'}, 401)
             try:
                 size = int(self.headers.get('Content-Length', '0'))
-                if not (0 < size <= 16 * 1024 * 1024):
-                    raise ValueError('请求体必须小于 16 MiB。')
+                if not (0 < size <= 32 * 1024 * 1024):
+                    raise ValueError('请求体必须小于 32 MiB。')
                 body = json.loads(self.rfile.read(size))
                 if not isinstance(body, dict):
                     raise ValueError('请求体必须是 JSON 对象。')
@@ -572,12 +599,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--token', default=None)
+    parser.add_argument('--token-stdin',action='store_true')
     parser.add_argument('--sdk', required=True)
     parser.add_argument('--ready-file')
     parser.add_argument('--ui')
     parser.add_argument('--project')
     args = parser.parse_args()
-    service = Service(args.sdk, args.token or secrets.token_urlsafe(32), args.ui)
+    private_token=args.token
+    if args.token_stdin:
+        private_token=json.loads(sys.stdin.readline(8193)).get('token')
+        if not isinstance(private_token,str) or not 32<=len(private_token)<=256:raise ValueError('无效服务凭据。')
+    service = Service(args.sdk, private_token or secrets.token_urlsafe(32), args.ui)
     if args.project:
         service.dispatch('/api/project/open', {'path': args.project})
     server = create_server(service, args.port)
@@ -589,6 +621,7 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
+        if service.ai_tasks:service.ai_tasks.stop()
         service.preview.stop()
         server.server_close()
 

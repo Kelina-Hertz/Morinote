@@ -4,6 +4,7 @@ const { fileURLToPath } = require('node:url');
 const path = require('node:path');
 
 const ROUTES = new Map([
+  ...['new','list','diff','prepare','rebase','mark','tool','execution','terminal','bridge','stop'].map(name=>['/api/ai/'+name,'POST']),
   ['/api/project', 'GET'], ['/api/project/new', 'POST'], ['/api/project/open', 'POST'],
   ['/api/project/save', 'POST'], ['/api/project/validate', 'POST'], ['/api/project/migrate', 'POST'],
   ['/api/project/inspect', 'POST'], ['/api/project/reindex', 'POST'],
@@ -85,4 +86,10 @@ function redact(value, secrets = []) {
   return value;
 }
 
-module.exports = { ROUTES, routeMethod, trustedSender, redact };
+function providerURL(value){
+ if(typeof value!=='string'||value.length>2000)throw new Error('模型端点无效');
+ const url=new URL(value);if(url.username||url.password||url.hash||url.search||!['https:','http:'].includes(url.protocol))throw new Error('端点需为 HTTP(S) 地址，不含凭据或查询参数');
+ if(url.protocol==='http:'&&!['127.0.0.1','localhost','[::1]'].includes(url.hostname))throw new Error('远程模型端点必须使用 HTTPS');
+ return url.href.replace(/\/$/,'');
+}
+module.exports = { ROUTES, routeMethod, trustedSender, redact, providerURL };

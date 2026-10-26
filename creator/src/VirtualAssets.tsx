@@ -12,13 +12,14 @@ import {virtualStatus,type Binding,type VirtualEntry} from './virtual-assets';
 import './virtual-assets.css';
 
 interface Props {
+ onAIContext?:(context:import("./ai-types").AIContext)=>void;
  project:Project;onOperation?:NativeOperation;onRefresh:()=>Promise<void>;onSource:(source:SourceLocation)=>void;
  onPick?:(asset:Asset)=>void;pickKind?:string;initialType?:AssetType;initialMissingOnly?:boolean;initialSelectedId?:string;runtimeMode?:'file'|'image';
 }
 const audioTypes=new Set(['bgm','ambience','sound','voice']);
 function Preview({asset}:{asset?:Asset}){if(asset?.virtual&&asset.virtualStatus==='bound'&&!asset.path)return <div className="media-placeholder"><Code2 size={22}/><small>原生显示对象</small><small>{asset.name}</small></div>;return asset?.kind==='audio'?<div className="audio-cover"><Music2/></div>:<Media asset={asset} thumbnail/>;}
 
-export default function VirtualAssets({project,onOperation,onRefresh,onSource,onPick,pickKind,initialType,initialMissingOnly=false,initialSelectedId,runtimeMode}:Props){
+export default function VirtualAssets({onAIContext,project,onOperation,onRefresh,onSource,onPick,pickKind,initialType,initialMissingOnly=false,initialSelectedId,runtimeMode}:Props){
  const library=project.nativeAssetLibrary;
  const [tab,setTab]=useState<AssetType>(initialType||defaultAssetTab(pickKind)),[mode,setMode]=useState<'virtual'|'physical'>('virtual');
  const [search,setSearch]=useState(''),[role,setRole]=useState(''),[costume,setCostume]=useState(''),[expression,setExpression]=useState(''),[category,setCategory]=useState(''),[missing,setMissing]=useState(initialMissingOnly);
@@ -66,7 +67,7 @@ export default function VirtualAssets({project,onOperation,onRefresh,onSource,on
    </>}
    {mode==='physical'&&<WindowedGrid className="asset-grid physical-resource-grid" rowHeight={330} resetKey={tab+'|'+search} items={resources.filter(a=>(audioTypes.has(tab)?a.kind==='audio':a.kind!=='audio')&&`${a.name} ${a.nativeGamePath}`.toLowerCase().includes(search.toLowerCase()))} itemKey={a=>a.id} render={a=><div className="asset-card" key={a.id}><div className="asset-preview"><Preview asset={a}/><b>{a.name}</b><code>{a.nativeGamePath}</code></div>{a.kind==='audio'&&<AudioPlayer id={a.id}/>}<small>{a.nativeAliases?.join(' / ')||'未声明图片标签'}</small></div>}/>}
   </section>
-  {entry&&!onPick&&mode==='virtual'&&<DockPanel id="asset-inspector" title="素材详情" initialSize={280}><aside className="inspector virtual-inspector"><div className="panel-heading">虚拟素材</div><div className="inspector-body"><Preview asset={assets.get(entry.id)}/>{entry.status!=='bound'&&<strong className={'virtual-state '+entry.status}>{virtualStatus[entry.status]}</strong>}
+  {entry&&!onPick&&mode==='virtual'&&<DockPanel id="asset-inspector" title="素材详情" initialSize={280}><aside className="inspector virtual-inspector"><div className="panel-heading">虚拟素材{onAIContext&&<button onClick={()=>onAIContext({id:"asset:"+entry.id,kind:"asset",title:entry.name,objectId:entry.id,path:entry.source?.path,line:entry.source?.line})}>添加到 AI</button>}</div><div className="inspector-body"><Preview asset={assets.get(entry.id)}/>{entry.status!=='bound'&&<strong className={'virtual-state '+entry.status}>{virtualStatus[entry.status]}</strong>}
    <label>名称<input key={entry.id+'name'+entry.name} defaultValue={entry.name} disabled={busy} onBlur={e=>update(entry,'name',e.target.value)}/></label>
    <label>类型<select disabled={busy} value={entry.type} onChange={e=>update(entry,'type',e.target.value)}>{assetTabs.filter(([id])=>audioTypes.has(id)===audioTypes.has(entry.type)).map(([id,title])=><option key={id} value={id}>{title}</option>)}</select></label>
    {(['character','costume','expression','category','requirement'] as const).map((field,i)=><label key={field}>{['角色','服饰','表情／差分','分类路径','具体需求'][i]}<input key={entry.id+field+entry[field]} defaultValue={entry[field]||''} disabled={busy} placeholder={field==='category'?'立绘/汐泉/日常服':undefined} onBlur={e=>update(entry,field,e.target.value)}/></label>)}

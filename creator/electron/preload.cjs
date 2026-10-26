@@ -2,6 +2,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('creator', Object.freeze({
+  onSourceRequest:(callback)=>{const listener=async(_event,request)=>{try{const value=await callback(request);ipcRenderer.send('creator:source-result',{id:request.id,value});}catch(error){ipcRenderer.send('creator:source-result',{id:request.id,error:String(error?.message||error)});}};ipcRenderer.on('creator:source-request',listener);return()=>ipcRenderer.removeListener('creator:source-request',listener);},
+  ai: (method, payload) => ipcRenderer.invoke('creator:ai', method, payload),
   request: (path, body) => ipcRenderer.invoke('creator:request', path, body),
   pickFolder: () => ipcRenderer.invoke('creator:pickFolder'),
   pickFiles: (kind) => ipcRenderer.invoke('creator:pickFiles', kind),

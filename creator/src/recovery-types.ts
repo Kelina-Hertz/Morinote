@@ -3,7 +3,7 @@ import type {SourceBuffer} from './native-buffers';
 import type {Asset} from './types';
 
 export interface RecoveryTab {
- id:string; title:string; kind:'flow'|'code'|'scene'|'config'|'assets'|'media'; target?:string;
+ id:string; title:string; kind:'flow'|'code'|'scene'|'config'|'assets'|'media'|'ai-diff'; target?:string; batchIds?:string[];
  callContext?:{callerLabel:string;source:SourceLocation};
 }
 export interface RecoveryMetadata {

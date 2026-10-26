@@ -11,9 +11,10 @@ test('portable startup finds repository above hash cache; remembers explicit pro
  const args={userData,sourceDirectory:path.join(root,'creator','.portable','hash','win-unpacked','resources','app.asar','electron'),executable:path.join(root,'creator','.portable','hash','win-unpacked','Morinote IDE.exe')};
  assert.equal(startupProject(args).path,root);rememberProject(userData,path.join(root,'other'));assert.equal(startupProject(args).path,path.join(root,'other'));
 });
-test('offline IPC has native editing routes and rejects all AI endpoints',()=>{
+test('native IPC rejects legacy AI routes; task-copy routes stay explicitly enumerated',()=>{
  for(const route of ['/api/workspace/merge','/api/workspace/motion-source','/api/preview/motion'])assert.equal(routeMethod(route,{}),'POST');
  assert.equal(routeMethod('/api/workspace/save-recovery'),'GET');
+ for(const route of ['/api/ai/new','/api/ai/tool','/api/ai/prepare'])assert.equal(routeMethod(route,{}),'POST');
  for(const route of ['/api/tasks','/api/tasks/new','/api/ai/settings'])assert.throws(()=>routeMethod(route,{}));
  assert.throws(()=>routeMethod('/api/workspace/document?path=../outside'));
 });

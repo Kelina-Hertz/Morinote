@@ -11,3 +11,6 @@ __pycache__/
 
 # Extracted portable runtime cache. The distributable ZIP is tracked with LFS.
 .portable/
+
+# Rebuilt from the pinned official source; delivered inside the portable archive.
+ai-runtime/

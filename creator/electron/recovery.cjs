@@ -79,6 +79,7 @@ function validateState(input) {
     }
     if (typeof document.base.hash !== 'string' || !/^[a-f0-9]{64}$/.test(document.base.hash)) throw new Error('无效的基础源码摘要');
     if (document.base.bom !== undefined && typeof document.base.bom !== 'boolean') throw new Error('无效的 BOM 标记');
+    if (document.deleted !== undefined && typeof document.deleted !== 'boolean') throw new Error('无效删除标记');
     if (document.base.exists !== undefined && typeof document.base.exists !== 'boolean') throw new Error('无效的源码存在标记');
     if (document.base.newline !== undefined && !['\n', '\r\n', '\r'].includes(document.base.newline)) throw new Error('无效的换行格式');
   }
@@ -89,8 +90,9 @@ function validateState(input) {
     if (!Number.isInteger(state.location.line) || state.location.line < 1 || state.location.line > 10000000) throw new Error('无效的恢复行号');
   }
   for (const tab of state.tabs) {
-    if (!isObject(tab) || typeof tab.id !== 'string' || typeof tab.title !== 'string' || tab.id.length > 4000 || tab.title.length > 2000 || !['flow', 'code', 'scene', 'config', 'assets', 'media'].includes(tab.kind)) throw new Error('无效的编辑器恢复标签');
+    if (!isObject(tab) || typeof tab.id !== 'string' || typeof tab.title !== 'string' || tab.id.length > 4000 || tab.title.length > 2000 || !['flow', 'code', 'scene', 'config', 'assets', 'media', 'ai-diff'].includes(tab.kind)) throw new Error('无效的编辑器恢复标签');
     if (tab.kind === 'code') relativeSource(tab.target);
+    if(tab.kind==='ai-diff'&&(typeof tab.target!=='string'||tab.target.length>120||tab.batchIds!==undefined&&(!Array.isArray(tab.batchIds)||tab.batchIds.length>200||tab.batchIds.some(id=>typeof id!=='string'||id.length>120))))throw new Error('无效的修改审阅恢复标签');
   }
   return state;
 }
@@ -250,8 +252,8 @@ class RecoveryStore {
     await this.prepareDirectory(context);
     const encoded = await this.encodeState(context, state);
     const time = new Date(Math.max(Date.now(), (Date.parse(context.latest?.time || context.clearedAt || '') || 0) + 1)).toISOString();
-    const fingerprint = hash(JSON.stringify([encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false]), encoded.metadata || null]));
-    const manifest = { version: 1, projectId: context.projectId, sequence: payload.sequence, time, reason: payload.reason, fingerprint, paths: state.documents.filter(document => document.base.exists === false || document.value !== document.base.content).map(document => document.base.path), state: encoded };
+    const fingerprint = hash(JSON.stringify([encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false, !!document.deleted]), encoded.metadata || null]));
+    const manifest = { version: 1, projectId: context.projectId, sequence: payload.sequence, time, reason: payload.reason, fingerprint, paths: state.documents.filter(document => document.deleted ? document.base.exists !== false : document.base.exists === false || document.value !== document.base.content).map(document => document.base.path), state: encoded };
     this.bound(payload);
     if (context.discardCorrupt) {
       // A fresh explicit editor backup supersedes a damaged discard marker;
@@ -302,8 +304,8 @@ class RecoveryStore {
     const manifest = { version: 1, projectId: context.projectId, sequence: payload.sequence, time, reason: 'discard', cleared: true };
     if (state) {
       const encoded = await this.encodeState(context, state);
-      const fingerprint = hash(JSON.stringify([encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false]), encoded.metadata || null]));
-      manifest.replacement = { version: 1, projectId: context.projectId, sequence: payload.sequence, time: new Date(Date.parse(time) + 1).toISOString(), reason: 'discard', fingerprint, paths: state.documents.filter(document => document.base.exists === false || document.value !== document.base.content).map(document => document.base.path), state: encoded };
+      const fingerprint = hash(JSON.stringify([encoded.documents.map(document => [document.base.path, document.valueRef, document.base.exists !== false, !!document.deleted]), encoded.metadata || null]));
+      manifest.replacement = { version: 1, projectId: context.projectId, sequence: payload.sequence, time: new Date(Date.parse(time) + 1).toISOString(), reason: 'discard', fingerprint, paths: state.documents.filter(document => document.deleted ? document.base.exists !== false : document.base.exists === false || document.value !== document.base.content).map(document => document.base.path), state: encoded };
     }
     this.bound(payload);
     if (context.latest?.state && !(await this.history(context)).some(item => item.fingerprint === context.latest.fingerprint)) {

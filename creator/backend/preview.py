@@ -123,8 +123,9 @@ class Engine:
 
 
 class PreviewManager:
-    def __init__(self, engine, address, token, on_edit):
+    def __init__(self, engine, address, token, on_edit, launcher=None):
         self.engine, self.address, self.token, self.on_edit = engine, address, token, on_edit
+        self.launcher = launcher or (lambda *args, **kwargs: subprocess.Popen(*args, **kwargs))
         self.lock = threading.RLock()
         self.session = None
         self.events = []
@@ -190,7 +191,7 @@ class PreviewManager:
                 options['startupinfo'] = startup
                 options['creationflags'] = subprocess.CREATE_NO_WINDOW
             with (output / 'launch.log').open('w', encoding='utf-8') as stream:
-                child = subprocess.Popen(self.engine.command + [str(output)], cwd=self.engine.sdk, env=env,
+                child = self.launcher(self.engine.command + [str(output)], cwd=self.engine.sdk, env=env,
                     stdout=stream, stderr=subprocess.STDOUT, **options)
             self.session = dict(id=sid, root=str(root), revision=build['revision'], entry=entry or {}, mode=mode,
                 taskId=task_id, output=str(output), process=child, commands=[], commandSequence=0,
@@ -241,7 +242,7 @@ class PreviewManager:
                 options.update(startupinfo=startup,creationflags=subprocess.CREATE_NO_WINDOW)
             launch_log=output/'launch.log'
             with launch_log.open('w',encoding='utf-8') as stream:
-                child=subprocess.Popen(self.engine.command+[str(root)],cwd=self.engine.sdk,env=env,stdout=stream,stderr=subprocess.STDOUT,**options)
+                child=self.launcher(self.engine.command+[str(root)],cwd=self.engine.sdk,env=env,stdout=stream,stderr=subprocess.STDOUT,**options)
             self.session=dict(id=sid,root=str(root),revision=document['revision'],entry=test,mode=mode,taskId=task_id,
                 output=str(root),launchLog=str(launch_log),process=child,commands=[],commandSequence=0,
                 runtime={'native':True,'clean':False,'direct':True,'projectPath':str(root),'scope':test['scope'],'motionPreview':bool(test.get('motionPreview'))},status='starting',
@@ -269,7 +270,7 @@ class PreviewManager:
                 options.update(startupinfo=startup,creationflags=subprocess.CREATE_NO_WINDOW)
             launch_log=logs/'launch.log'
             with launch_log.open('w',encoding='utf-8') as stream:
-                child=subprocess.Popen(self.engine.command+[str(root)],cwd=self.engine.sdk,env=env,stdout=stream,stderr=subprocess.STDOUT,**options)
+                child=self.launcher(self.engine.command+[str(root)],cwd=self.engine.sdk,env=env,stdout=stream,stderr=subprocess.STDOUT,**options)
             self.session=dict(id=sid,root=str(root),revision=document['revision'],entry={'clean':True},mode='play',
                 taskId=task_id,output=str(root),launchLog=str(launch_log),process=child,commands=[],commandSequence=0,
                 runtime={'native':True,'clean':True,'original':True,'projectPath':str(root)},status='running',

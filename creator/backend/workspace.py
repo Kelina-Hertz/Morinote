@@ -68,7 +68,8 @@ def read_overlay(root, relative, documents=None):
     supplied=next((d for d in (documents or []) if d['path']==relative),None)
     if supplied:
         if supplied.get('hash')!=current['hash']:raise ValueError('源码发生外部修改：'+relative)
-        current['content']=supplied['content']
+        current['content']='' if supplied.get('delete') else supplied['content']
+        if supplied.get('delete'):current['exists']=False
     return current
 
 
@@ -112,6 +113,9 @@ def projection(root, project, documents, ide=None):
     contents={}
     for document in documents:
         path=document['path'];contents[path]=read_overlay(root,path,documents)['content']
+        if document.get('delete'):
+            candidate['nativeRenpy']['files']=[f for f in candidate['nativeRenpy']['files'] if f['projectPath']!=path]
+            continue
         if path.startswith('game/') and Path(path).suffix in ('.rpy','.py') and not any(i['projectPath']==path for i in candidate['nativeRenpy']['files']):
             candidate['nativeRenpy']['files'].append({'projectPath':path,'gamePath':path.removeprefix('game/')})
     baseline_path=safe_path(root,project['nativeRenpy']['indexPath'])

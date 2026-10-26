@@ -91,7 +91,7 @@ class NativeTrackTests(unittest.TestCase):
         atomic_json(self.root / 'sources/renpy-index.json', index)
         atomic_json(self.root / 'project.json', self.doc)
         upgraded = load_project(self.root)
-        self.assertEqual(upgraded['nativeRenpy']['trackVersion'], 2)
+        self.assertEqual(upgraded['nativeRenpy']['trackVersion'], 3)
         self.assertIsNotNone(upgraded['scenes'][0]['lines'][0]['visual'])
         self.assertTrue((self.root / '.creator/migrations/native-tracks-v2/project.json').exists())
         self.assertEqual(load_project(self.root)['revision'], upgraded['revision'])

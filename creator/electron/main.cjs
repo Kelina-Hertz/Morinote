@@ -1,6 +1,6 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain, dialog, session } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, session, safeStorage } = require('electron');
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
@@ -8,13 +8,21 @@ const { spawn } = require('node:child_process');
 const { pathToFileURL } = require('node:url');
 const { routeMethod, trustedSender, redact } = require('./security.cjs');
 const { startupProject, rememberProject } = require('./workspace-startup.cjs');
+const { AIManager } = require('./ai-manager.cjs');
+const { SourceService } = require('./source-service.cjs');
 const { RecoveryStore } = require('./recovery.cjs');
 const { RenpyLauncher } = require('./renpy-launcher.cjs');
 
-let window, backend, serviceURL, loadedURL, renpyLauncher;
+let window, backend, serviceURL, loadedURL, renpyLauncher, aiManager;
+const editorRequests=new Map();
+function editorRequest(action,payload,projectSession){
+  if(!window||window.isDestroyed())return Promise.reject(new Error('编辑器不可用。'));
+  const id=crypto.randomUUID();
+  return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{editorRequests.delete(id);reject(new Error('编辑器响应超时；请核对修改记录，不要盲目重试。'));},300000);editorRequests.set(id,{resolve,reject,timer,projectSession});window.webContents.send('creator:source-request',{id,action,payload,projectSession});});
+}
 let exiting = false;
 let startupWarning = '';
-app.setName('Morinote IDE Offline');
+app.setName('Morinote IDE');
 const profileDirectory = app.commandLine.getSwitchValue('user-data-dir');
 app.setPath('userData', profileDirectory ? path.resolve(profileDirectory) : path.join(app.getPath('appData'), 'Morinote-IDE-Offline'));
 const token = crypto.randomBytes(32).toString('hex');
@@ -55,10 +63,11 @@ async function startBackend() {
   fs.mkdirSync(readyDir, { recursive: true });
   const ready = path.join(readyDir, `ready-${crypto.randomUUID()}.json`);
   let processError = '', output = '';
-  backend = spawn(python, ['-B', server, '--port', '0', '--token', token, '--sdk', sdk, '--ready-file', ready], {
-    cwd: base, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
+  backend = spawn(python, ['-B', server, '--port', '0', '--token-stdin', '--sdk', sdk, '--ready-file', ready], {
+    cwd: base, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'],
     env: { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8', PYTHONDONTWRITEBYTECODE: '1' },
   });
+  backend.stdin.on('error',()=>{});backend.stdin.end(JSON.stringify({token})+'\n');
   backend.on('error', error => { processError = error.message; });
   const keepOutput = chunk => { output = (output + chunk.toString('utf8')).slice(-6000); };
   backend.stdout.on('data', keepOutput); backend.stderr.on('data', keepOutput);
@@ -87,10 +96,12 @@ function handle(channel, fn) {
 }
 
 function registerIPC() {
+  ipcMain.on('creator:source-result',(event,result)=>{if(!trustedSender(event,window,loadedURL))return;const entry=editorRequests.get(result?.id);if(!entry)return;editorRequests.delete(result.id);clearTimeout(entry.timer);if(entry.projectSession!==recovery.context?.session)return entry.reject(new Error('项目已切换。'));result.error?entry.reject(new Error(result.error)):entry.resolve(result.value);});
   handle('creator:request', async (route, body) => {
     const routePath = typeof route === 'string' ? route.split('?')[0] : '';
     if (closePending && ['/api/project/open', '/api/project/new', '/api/project/migrate'].includes(routePath)) throw new Error('正在备份并关闭编辑器，请先取消关闭再切换项目');
     if (pendingSourceMutations.size && ['/api/project/open', '/api/project/new', '/api/project/migrate'].includes(routePath)) throw new Error('源码保存尚未结束，完成后才能切换项目');
+    if(['/api/project/open','/api/project/new','/api/project/migrate'].includes(routePath))await aiManager?.stop();
     const mutation = SOURCE_MUTATIONS.has(routePath) && body !== undefined ? {} : null;
     if (mutation) pendingSourceMutations.add(mutation);
     let result;
@@ -108,6 +119,7 @@ function registerIPC() {
     if(route==='/api/project' && startupWarning) result.startupWarning=startupWarning;
     return result;
   });
+  handle('creator:ai', (method,payload) => {if(closePending)throw new Error('正在关闭 IDE。');return aiManager.handle(method,payload);});
   handle('creator:recovery', (method, payload) => recovery.request(method, payload));
   handle('creator:openRenpy', async payload => {
     if (closePending) throw new Error('正在关闭 IDE，请先取消关闭。');
@@ -176,6 +188,7 @@ function cancelClose() {
 
 async function prepareClose() {
   if (!window || window.isDestroyed() || closePending) return;
+  void aiManager?.stop();
   const id = crypto.randomUUID();
   const failure = await new Promise(resolve => {
     // Hot Exit requires a backup acknowledgement, not an unbounded UI wait.
@@ -253,6 +266,8 @@ async function boot() {
     try {const result=await backendRequest('/api/project/open',{path:initial.path});rememberProject(app.getPath('userData'),result.root);}
     catch(error) {startupWarning=`无法打开${initial.remembered?'上次':'默认'}项目，请重新定位：${initial.path}。${error.message}`;}
   }
+  const source=new SourceService({directory:app.getPath('userData'),request:backendRequest,editor:editorRequest,context:()=>recovery.context});
+  aiManager=new AIManager({directory:app.getPath('userData'),base:app.isPackaged?process.resourcesPath:path.resolve(__dirname,'..'),safeStorage,request:backendRequest,context:()=>recovery.context,source});
   registerIPC(); createWindow();
   backend.on('exit', code => { if (!exiting && window) dialog.showErrorBox('本地服务已退出', `本地制作服务已退出（${code}），请重新启动 IDE。`); });
 }
@@ -276,6 +291,6 @@ else {
     // A hung local service must not leave the desktop process stuck exiting.
     const deadline = setTimeout(finish, 3500);
     const stop = serviceURL ? backendRequest('/api/preview/stop', {}, { signal: AbortSignal.timeout(2500) }).catch(() => {}) : Promise.resolve();
-    stop.finally(finish);
+    Promise.allSettled([stop,aiManager?.stop()]).finally(finish);
   });
 }

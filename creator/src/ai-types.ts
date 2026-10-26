@@ -1,0 +1,17 @@
+import type {SourceBuffer} from './native-buffers';
+import type {RecoveryState} from './recovery-types';
+export type AIState={documents:SourceBuffer[];metadata?:RecoveryState['metadata']};
+export type AISettings={storageWarning?:string;autoSave:boolean;approvalMode?:'ask'|'reviewer';provider:string;secureStorage:boolean;providers:Record<string,{model:string;baseUrl:string;hasKey:boolean;credentialStatus?:'missing'|'ready'|'unreadable'|'unavailable';keyError?:string}>;runtime?:{version:string;commit:string;available:boolean;reason?:string}};
+export type AITask={id:string;conversationId?:string;parentTaskId?:string;hasChanges?:boolean;prompt:string;created:number;status:string;sessionId?:string;provider?:string;model?:string;error?:string;usage?:unknown};
+export type AIEvent={seq:number;taskId:string;conversationId?:string;messageId?:string;revision?:number;type:string;time:number;data:unknown};
+export type Approval={id:string;taskId:string;conversationId?:string;command:string;cwd:string;purpose:string;scope:string;enforcement:string;contentHash:string;expires:number};
+export type AIFileDiff={path:string;before:string|null;after:string|null;status:string};
+export type AIReview={id:string;files:AIFileDiff[];reviewHash:string;conflict:boolean;diskChanged:boolean;editorChanged:boolean;metadata:{before:Record<string,unknown>;after:Record<string,unknown>}|null};
+export type AIApply={id:string;reviewHash:string;documents:SourceBuffer[];metadata:AIReview['metadata']};
+export type AIMerge={path:string;base:string|null;local:string|null;disk:string|null;parts:{conflict:boolean;text?:string;local?:string;disk?:string}[]};
+export type AIContext={id:string;kind:'file'|'code'|'scene'|'line'|'asset';title:string;path?:string;line?:number;endLine?:number;text?:string;objectId?:string;version?:string};
+export type AIQueued={id:string;text:string;contexts:AIContext[];created:number};
+export type AIConversation={id:string;title:string;created:number;updated:number;status:string;queue:AIQueued[];draft:string;contexts?:AIContext[];pinned?:boolean;archived?:boolean;legacy?:boolean;error?:string;provider?:string;model?:string;usage?:Record<string,number>;needsNewConversation?:boolean;reviewedRounds?:Record<string,string>};
+export type AIChangeBatch={id:string;conversationId:string;roundId?:string;callId:string;time:number;files:AIFileDiff[];transaction:string;kept:string[];reverted?:string[];dependencies?:{paths:string[];reason:string}[]};
+export type AIChangeNotice={roundId:string;batchIds:string[];paths:string[];count:number;reviewHash:string};
+export type AIChangeCheckpoint=AIChangeNotice&{id:string;conversationId:string;purpose:string;expires:number};

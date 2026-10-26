@@ -62,8 +62,8 @@ init 999 python:
                     pending = None
                 result = request("/bridge/poll?session=" + client.session + "&after=" + str(client.last))
                 for command in result["commands"]:
-                    client.last = command["id"]
                     renpy.invoke_in_main_thread(client.handler, command)
+                    client.last = command["id"]
                 time.sleep(.04)
             except Exception:
                 time.sleep(.3)

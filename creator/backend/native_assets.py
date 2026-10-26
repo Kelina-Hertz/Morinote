@@ -116,6 +116,7 @@ def augment(project, scripts, images, constants):
         previous = project.get('nativeAssetLibrary')
         table = data_from_library(previous) if previous else {'version': 1, 'entries': [], 'deleted': []}
     entries = {e['id']: copy.deepcopy(e) for e in table['entries']}
+    persisted_ids = set(entries)
     runtime_entries = {(e['runtime']['kind'], e['runtime']['key']): e for e in entries.values()}
     deleted = set(table.get('deleted', []))
     declarations, references, audio_variables = {}, {}, {}
@@ -186,7 +187,11 @@ def augment(project, scripts, images, constants):
                     try: game_path(path)
                     except ValueError: continue
                     asset = by_path.get(path)
-                    if asset is not None: seed('file', path, asset, source)
+                    is_voice = bool(re.match(r'\s*(?:voice(?!\s+sustain\b)|(?:play|queue)\s+voice)\s+', row)) and Path(path).suffix.lower() in AUDIO
+                    if asset is None and is_voice:asset = {'kind':'audio','nativeGamePath':path,'name':Path(path).stem,'status':'missing'}
+                    if asset is not None:
+                        entry = seed('file', path, asset, source)
+                        if is_voice and entry and entry['id'] not in persisted_ids and entry['type'] in ('unknown','sound') and asset.get('id') not in project.get('ide',{}).get('assetTypes',{}):entry['type'] = 'voice'
     for asset in physical:
         path = asset.get('nativeGamePath', '')
         if not path or Path(path).suffix.lower() not in IMAGE | AUDIO: continue

@@ -148,7 +148,7 @@ def project_tracks(document, scripts, records):
     document['nativeRenpy']['audioChannels']=channels
     constants, images, transforms, resource = catalog(document, scripts)
     by_file = {item['gamePath']: text.splitlines() for item, text in scripts}
-    stats = {'visualCues': 0, 'audioCues': 0, 'annotatedLines': 0}
+    stats = {'visualCues': 0, 'audioCues': 0, 'voiceCues': 0, 'annotatedLines': 0}
     for scene in document['scenes']:
         label = next(l for l in document['nativeRenpy']['labels'] if l['id'] == scene['id'])
         rows = by_file[label['file']]
@@ -165,6 +165,7 @@ def project_tracks(document, scripts, records):
             dirty = {'visual': index == 0, 'audio': index == 0}
             starts = {}
             notes = []
+            voices = []
             i = cursor
             while i < target:
                 body = rows[i].strip()
@@ -186,6 +187,7 @@ def project_tracks(document, scripts, records):
                     multiplier=float(setter[1]);channel=setter[2]
                     if math.isfinite(multiplier) and multiplier>=0:
                         channel_volumes[channel]=multiplier
+                        if channel == 'voice':i+=1;continue
                         cue=audio.setdefault(channel,{'asset':'','volume':1,'fileVolume':1,'fadeout':.5,'fadein':.8})
                         cue['volume']=cue.get('fileVolume',cue['volume'])*multiplier
                         cue['channelVolume']=multiplier
@@ -195,6 +197,7 @@ def project_tracks(document, scripts, records):
                 # Nested control flow has path-dependent state. Do not let a
                 # previous arm leak into a sibling or a merge in the editor.
                 if re.match(r'(?:if |elif |else:|menu:|while |for |call\b|jump\b|return\b|python\b|\$)', body) or indent != last_indent:
+                    for candidate in voices:candidate.update(editable=False, reason='语音与本句之间存在控制流或自定义代码，请从源码调整。')
                     for track, state in (('visual', visual), ('audio', audio)):
                         state['nativeUnknown'] = ['条件／调用或自定义代码影响，实际状态由运行路线决定']
                         if track=='audio':
@@ -291,6 +294,12 @@ def project_tracks(document, scripts, records):
                     dirty['visual'] = True
                     starts.setdefault('visual', i + 1)
                     i = end; continue
+                from .native_voice import parse as parse_voice
+                voice = parse_voice(rows[i], record['path'], i + 1, constants, resource)
+                if voice is not None:
+                    if indent != len(rows[target]) - len(rows[target].lstrip()):
+                        voice.update(editable=False, reason='语音处于不同的控制流层级，请从源码调整。')
+                    voices.append(voice);i += 1;continue
                 sound = re.match(r'(play|stop|queue)\s+('+channel_pattern+r')\b\s*(.*)', body)
                 if sound:
                     op, channel, tail = sound.groups()
@@ -318,8 +327,14 @@ def project_tracks(document, scripts, records):
                     dirty['audio'] = True
                     starts.setdefault('audio', i + 1)
                 elif re.match(r'(?:camera\b|with\b|pause\b)', body):
+                    if body.startswith('pause'):
+                        for candidate in voices:candidate.update(editable=False, reason='语音与本句之间存在等待语句，请从源码调整。')
                     notes.append('原演出：' + body)
                 i += 1
+            line['voice'] = copy.deepcopy(voices[-1]) if voices else None
+            if len(voices) > 1:
+                line['voice'].update(editable=False, reason='本句前有多条语音指令，请从源码调整。')
+            if voices: stats['voiceCues'] += 1
             record['trackStarts'] = starts
             record['trackContextStart'] = cursor
             record['trackContext'] = rows[cursor:target]
@@ -332,4 +347,4 @@ def project_tracks(document, scripts, records):
                 line['source']['trackNotes'] = notes
                 stats['annotatedLines'] += 1
             cursor = target + 1
-    document['nativeRenpy'].update(trackVersion=2, trackStats=stats)
+    document['nativeRenpy'].update(trackVersion=3, trackStats=stats)

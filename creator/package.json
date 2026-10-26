@@ -1,12 +1,12 @@
 {
   "name": "morinote-ide-offline",
-  "version": "0.2.23-no-ai.1",
+  "version": "0.4.2",
   "private": true,
-  "description": "Local Morinote RenPy IDE without AI services",
+  "description": "Morinote RenPy IDE with live DSH conversations",
   "main": "electron/main.cjs",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
-    "build": "vite build",
+    "build": "vite build && node scripts/write-build-version.cjs",
     "start": "electron .",
     "typecheck": "tsc --noEmit",
     "package:dir": "npm run build && node scripts/package.cjs",
@@ -17,7 +17,9 @@
     "lucide-react": "^0.468.0",
     "monaco-editor": "0.55.1",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",
@@ -32,7 +34,7 @@
     "appId": "studio.morinote.ide.offline",
     "productName": "Morinote IDE",
     "directories": {
-      "output": "release-0.2.23-no-ai.1"
+      "output": "release-0.4.2"
     },
     "files": [
       "dist/**/*",
@@ -50,6 +52,15 @@
           "**/*",
           "!tests/**/*",
           "!**/__pycache__/**/*"
+        ]
+      },
+      {
+        "from": "ai-runtime",
+        "to": "ai-runtime",
+        "filter": [
+          "**/*",
+          "!node_modules/@deepseek-ai/**/src/**/*",
+          "!node_modules/@deepseek-ai/**/lib/types/client/**/*"
         ]
       }
     ],

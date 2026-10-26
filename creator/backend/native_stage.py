@@ -51,6 +51,9 @@ def edit(root, project, op):
     if not 0<=i<len(rows):raise ValueError('无效源码位置。')
     raw=rows[i].rstrip('\r\n');indent=raw[:len(raw)-len(raw.lstrip())];kind=op['operation']
     if op.get('statement') is not None and raw!=op['statement']:raise ValueError('演出语句位置已变化，请重新选择后编辑。')
+    if kind=='voice':
+        from .native_voice import edit as voice_edit
+        return voice_edit(project,{**op,'_root':root},doc,i)
     if kind=='motion':
         from .native_motion import edit as motion_edit
         return motion_edit(root,project,op,doc,i)
@@ -132,7 +135,14 @@ def edit(root, project, op):
     elif kind=='delete_text':
         from .renpy_import import SAY
         if not SAY.match(raw):raise ValueError('这里只能删除一条文字语句。')
-        del rows[i]
+        line=next((l for s in project['scenes'] for l in s['lines'] if l['id']==op.get('nodeId')),None)
+        removals={i}
+        if line and line.get('voice'):
+            from .native_voice import source_index
+            voice_at=source_index(line,rows,i)
+            if voice_at is not None:removals.add(voice_at)
+        if i and re.match(r'^\s*\$ creator_native_auto_prepare\(',rows[i-1]):removals.add(i-1)
+        for at in sorted(removals,reverse=True):del rows[at]
     elif kind=='image':
         alias=op['value']
         if not any(alias in a.get('nativeAliases',[]) for a in project['assets']):raise ValueError('图片标签没有在本项目登记。')
