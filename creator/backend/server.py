@@ -17,7 +17,8 @@ from urllib.parse import parse_qs, urlsplit
 
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from backend.project import new_project, load_project, save_project, validate_project, review_digest, project_file
+from backend.project import load_project, save_project, validate_project, review_digest, project_file
+from backend.new_renpy_project import create_native_project
 from backend.preview import Engine, PreviewManager
 from backend.project import atomic_json, safe_path
 
@@ -25,7 +26,7 @@ MEDIA = {'.png', '.jpg', '.jpeg', '.webp', '.avif', '.svg', '.gif', '.ogg', '.op
 
 
 class Service:
-    def __init__(self, sdk, token, ui=None):
+    def __init__(self, sdk, token, ui=None, media_token=None):
         os.environ['CREATOR_RENPY_SDK'] = str(Path(sdk).resolve())
         self.engine = Engine(sdk)
         self.token = token
@@ -36,6 +37,9 @@ class Service:
         self.project_session = uuid.uuid4().hex
         self._read_cache = None
         self.ai_tasks = None
+        self.media_token = media_token or secrets.token_hex(32)
+        from backend.generated_media import GeneratedMedia
+        self.generated_media = GeneratedMedia()
 
     def read_snapshot(self):
         """Read-only consumers share one descriptor parse, keyed by disk identity."""
@@ -124,8 +128,40 @@ class Service:
         save_project(root, value, body['revision'])
         return self.response()
 
-    def dispatch(self, route, body):
+    def dispatch(self, route, body, media_token=None):
         self.check_session(body.get('projectSession'))
+        if route.startswith('/api/generated-media/'):
+            if not media_token or not secrets.compare_digest(media_token, self.media_token):
+                raise ValueError('生成产物入库仅允许受管媒体服务调用。')
+            if body.get('projectSession') != self.project_session or str(self.current().resolve()) != body.get('projectRoot'):
+                raise ValueError('生成任务的项目会话已失效。')
+            action = route.rsplit('/', 1)[-1]
+            if action == 'register':
+                return self.generated_media.register(self.current(), self.project_session, body)
+            if action == 'import':
+                return self.generated_media.publish(self.current(), self.project_session, body)
+            if action == 'preview':
+                from backend.ai_tasks import AITasks
+                if self.ai_tasks is None:self.ai_tasks=AITasks(self.current(),self.engine)
+                return self.generated_media.preview(self.current(), self.project_session, body, self.ai_tasks)
+            if action == 'prepare':
+                from backend.media_authoring import prepare
+                return prepare(self.current(), load_project(self.current()), body)
+            raise ValueError('未知生成产物操作。')
+        if route == '/api/fragment/validate' or route == '/api/fragment/prepare':
+            if not body.get('projectSession'):
+                raise ValueError('片段操作必须绑定当前项目会话。')
+            from backend import fragment_authoring, workspace
+            project = load_project(self.current())
+            if route.endswith('validate'):
+                candidate = workspace.projection(self.current(), project, body.get('documents', []), ide=body.get('ide'))
+                lines = fragment_authoring.validate(body['plan'], candidate)
+                if any(line.get('voice') is not None for line in lines):
+                    from backend.native_voice import filename_pattern
+                    if filename_pattern(self.current(), candidate, body.get('documents')).count('{filename}') != 1:
+                        raise ValueError('项目语音路径规则无法安全转换，未提交配音生成。')
+                return {'valid': True, 'lines': len(lines)}
+            return fragment_authoring.prepare(self.current(), project, body)
         if route.startswith('/api/ai/'):
             from backend.ai_tasks import AITasks
             if self.ai_tasks is None:self.ai_tasks=AITasks(self.current(),self.engine)
@@ -231,7 +267,7 @@ class Service:
                 return {'kind': 'unknown', 'path': str(path)}
         if route == '/api/project/new':
             path = Path(body['path']).expanduser().resolve()
-            new_project(path, body.get('title', '新的故事'), bool(body.get('demo')))
+            create_native_project(path, body.get('title', '新的故事'), bool(body.get('demo')), sdk=self.engine.sdk)
             self.select_project(path)
             return self.response()
         if route == '/api/project/open':
@@ -582,7 +618,7 @@ def create_server(service, port):
                 if route == '/bridge/event':
                     return self.send(service.preview.receive(body['sessionId'], body['type'], body.get('payload', {})))
                 with service.lock:
-                    result = service.dispatch(route, body)
+                    result = service.dispatch(route, body, media_token=self.headers.get('X-Creator-Media'))
                 self.send(result)
             except (ValueError, KeyError, TypeError, OSError) as error:
                 self.send({'error': str(error)}, 400)
@@ -606,10 +642,13 @@ def main():
     parser.add_argument('--project')
     args = parser.parse_args()
     private_token=args.token
+    media_token=None
     if args.token_stdin:
-        private_token=json.loads(sys.stdin.readline(8193)).get('token')
+        credentials=json.loads(sys.stdin.readline(8193))
+        private_token=credentials.get('token')
+        media_token=credentials.get('mediaToken')
         if not isinstance(private_token,str) or not 32<=len(private_token)<=256:raise ValueError('无效服务凭据。')
-    service = Service(args.sdk, private_token or secrets.token_urlsafe(32), args.ui)
+    service = Service(args.sdk, private_token or secrets.token_urlsafe(32), args.ui, media_token=media_token)
     if args.project:
         service.dispatch('/api/project/open', {'path': args.project})
     server = create_server(service, args.port)

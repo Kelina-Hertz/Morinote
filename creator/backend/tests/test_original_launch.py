@@ -61,6 +61,8 @@ class OriginalLaunchTests(unittest.TestCase):
         env=self.Popen.call_args.kwargs['env']
         support=Path(env['RENPY_SEARCHPATH'])
         self.assertTrue(support.is_relative_to(self.root/'.creator/native-preview'))
+        self.assertLessEqual(len(support.parent.name),12)
+        self.assertEqual(len(env['CREATOR_PREVIEW_SESSION']),32)
         self.assertTrue((support/'creator_native_preview.rpy').is_file())
         self.assertTrue(Path(env['CREATOR_NATIVE_INDEX']).is_file())
         self.assertEqual(status['status'],'starting');self.assertTrue(status['runtime']['direct'])

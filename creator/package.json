@@ -1,6 +1,6 @@
 {
   "name": "morinote-ide-offline",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "private": true,
   "description": "Morinote RenPy IDE with live DSH conversations",
   "main": "electron/main.cjs",
@@ -10,7 +10,9 @@
     "start": "electron .",
     "typecheck": "tsc --noEmit",
     "package:dir": "npm run build && node scripts/package.cjs",
-    "test": "node scripts/test.cjs"
+    "test": "node scripts/test.cjs",
+    "test:media-fixture": "electron electron/tests/run-media-fragment-fixture.cjs",
+    "test:media-budget-fixture": "electron electron/tests/run-media-fragment-fixture.cjs --low-cost"
   },
   "dependencies": {
     "@xyflow/react": "^12.9.3",
@@ -34,7 +36,7 @@
     "appId": "studio.morinote.ide.offline",
     "productName": "Morinote IDE",
     "directories": {
-      "output": "release-0.4.2"
+      "output": "release-0.4.3"
     },
     "files": [
       "dist/**/*",

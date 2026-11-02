@@ -11,7 +11,7 @@
 
 状态 `unbound/broken/temporary/bound` 是内部值。面向用户讲清楚“缺失什么”“现用什么临时替代”；无需给正常卡片附“可用／正式绑定”等标签。临时替代仍属待补，不能清空需求或声称素材已经补齐。
 
-所有操作通过 `morinote_operate(adapter="assets", operation=...)`，写入副本的 `game/creator_assets/asset_bindings.rpy`，保留原标签引用。
+虚拟素材操作通过 `morinote_operate(adapter="assets", operation=...)`，经共享源码服务写入当前编辑稿的 `game/creator_assets/asset_bindings.rpy`，保留原标签引用。
 
 新建缺失项：
 ```json
@@ -33,3 +33,5 @@
 `unbind`、`id` 取消更换后回到占位；`delete`、`id` 删除无引用的虚拟条目，不删除任何实际文件。有引用时不能删除，应保留条目并明确需求。重命名只用 `update.values.name`，不能重命名运行标签或资源文件。
 
 已有图片标签带缩放时，引用其原定义，不再套相同缩放。复杂定义／自定义显示对象无法可靠静态预览时保留原定义与源码入口。不要把用户未提供的服饰、场景、CG 或音乐视为“已有素材”，也不要通过覆盖只读资源绕过缺失状态。
+
+新增图片与配音可使用 `morinote_generate_media`，片段使用 `morinote_generate_fragment`；先生成候选，用户验收后才发布与绑定，详见 `morinote_guide(section="media")`。生成目录是窄化例外，不允许任意素材写入；旧素材的缺失和临时替代流程继续有效。

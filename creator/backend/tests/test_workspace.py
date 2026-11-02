@@ -253,3 +253,28 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(read_document(self.root,doc['path'])['content'],original)
 
 if __name__=='__main__':unittest.main()
+
+
+class AtomicWritePathTests(unittest.TestCase):
+    def test_deep_destination_uses_short_exclusive_sibling(self):
+        from backend.workspace import atomic_bytes
+        from unittest.mock import patch
+        import os
+        with tempfile.TemporaryDirectory() as temporary:
+            root=Path(temporary)
+            parent=root
+            while len(str(parent))+25 < 235:
+                parent=parent/'nested-layer'
+            target=parent/'output.jpg'
+            replace=os.replace
+            seen=[]
+            def checked(source, destination):
+                seen.append(Path(source))
+                self.assertEqual(Path(source).parent, target.parent)
+                self.assertLessEqual(len(Path(source).name), 12)
+                replace(source,destination)
+            with patch('backend.workspace.os.replace',side_effect=checked):
+                atomic_bytes(target,b'first');atomic_bytes(target,b'second')
+            self.assertEqual(target.read_bytes(),b'second')
+            self.assertNotEqual(seen[0],seen[1])
+            self.assertFalse(any(p.exists() for p in seen))

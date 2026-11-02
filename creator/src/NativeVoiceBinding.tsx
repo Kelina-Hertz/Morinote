@@ -37,7 +37,7 @@ export default function NativeVoiceBinding({voice,asset,ordinal,prefill,onChoose
   <button className="native-line-voice-file" title={voice?.reason||title} disabled={!editable} onClick={onChoose}>{title}</button>
   {!!voice&&<><button aria-label={'试听第 '+ordinal+' 句语音'} title="试听语音" disabled={!media} onClick={()=>void audition()}>{playing||loading?<Square size={12}/>:<Play size={12}/>}</button><button aria-label={'移除第 '+ordinal+' 句语音'} title="移除语音" disabled={!editable} onClick={onRemove}><X size={12}/></button></>}
   {voice?.nativeSource&&<button aria-label={'打开第 '+ordinal+' 句语音源码'} title="语音源码" onClick={()=>onSource(voice.nativeSource!)}><Code2 size={12}/></button>}
-  {missing&&<small>语音缺失</small>}{asset?.virtualStatus==='temporary'&&<small>缺失 · 暂用替代</small>}
+  {missing&&<small>语音缺失</small>}{voice?.generation?.stale&&<small title="台词或说话人已更改，现有配音尚未更新。重新配音只在你提出要求时执行。">配音待更新</small>}{asset?.virtualStatus==='temporary'&&<small>缺失 · 暂用替代</small>}
   {prefill&&<small>预填消息</small>}{error&&<small role="alert">{error}</small>}
  </div>;
 }

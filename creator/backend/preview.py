@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 import subprocess
 import threading
+import tempfile
 import time
 import uuid
 
@@ -217,7 +218,10 @@ class PreviewManager:
             raise ValueError('原工程存在与编辑桥冲突的名称，请使用原游戏试玩或调整名称。')
         with self.lock:
             sid=uuid.uuid4().hex
-            output=root/'.creator/native-preview'/sid
+            # The full session ID remains in the protocol, not in every disk path.
+            preview_base=root/'.creator/native-preview'
+            preview_base.mkdir(parents=True,exist_ok=True)
+            output=Path(tempfile.mkdtemp(prefix='p-',dir=preview_base))
             support=output/'support'
             support.mkdir(parents=True,exist_ok=True)
             bridge=Path(__file__).with_name('creator_native_preview.rpy')

@@ -1,7 +1,7 @@
 {
-    "version":  "0.4.2",
+    "version":  "0.4.3",
     "platform":  "windows-x64",
-    "archive":  "Morinote-IDE-0.4.2-win-x64.zip",
-    "bytes":  600758059,
-    "sha256":  "af6429756498f7a70602be58345619c5998f8f3344731a6785952c2f088c150e"
+    "archive":  "Morinote-IDE-0.4.3-win-x64.zip",
+    "bytes":  600848311,
+    "sha256":  "8ae45cdf352230e1f8b1627d00796b9e5d81b246706408a6598512bc88f038ae"
 }

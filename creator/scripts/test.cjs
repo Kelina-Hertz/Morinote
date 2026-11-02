@@ -3,7 +3,7 @@ const root=path.resolve(__dirname,'..');
 function run(command,args){const result=spawnSync(command,args,{cwd:root,stdio:'inherit',windowsHide:true,env:{...process.env,PYTHONUTF8:'1'}});if(result.error)throw result.error;if(result.status!==0)throw new Error(command+' failed ('+result.status+')');}
 try{
  run(process.execPath,[require.resolve('typescript/bin/tsc'),'--noEmit']);
- run(process.execPath,['--test','electron/tests/offline.test.cjs']);
+ run(process.execPath,['--test','electron/tests/offline.test.cjs','electron/tests/media.test.cjs','electron/tests/creative.test.cjs']);
  fs.mkdirSync(path.join(root,'.checks'),{recursive:true});
  require('esbuild').buildSync({entryPoints:[path.join(root,'tests/renderer.test.ts')],bundle:true,platform:'node',format:'cjs',outfile:path.join(root,'.checks/renderer.test.cjs')});
  run(process.execPath,['--test','.checks/renderer.test.cjs']);

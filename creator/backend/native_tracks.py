@@ -332,6 +332,8 @@ def project_tracks(document, scripts, records):
                     notes.append('原演出：' + body)
                 i += 1
             line['voice'] = copy.deepcopy(voices[-1]) if voices else None
+            from .native_voice import generation_metadata
+            generation_metadata(line, rows, cursor, target)
             if len(voices) > 1:
                 line['voice'].update(editable=False, reason='本句前有多条语音指令，请从源码调整。')
             if voices: stats['voiceCues'] += 1

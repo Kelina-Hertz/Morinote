@@ -5,6 +5,7 @@ import copy
 import hashlib
 import json
 import os
+import tempfile
 from pathlib import Path
 import uuid
 
@@ -126,9 +127,11 @@ def projection(root, project, documents, ide=None):
 
 def atomic_bytes(path, data):
     path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_name(path.name + '.' + uuid.uuid4().hex + '.tmp')
+    # Short, exclusive sibling name avoids extending an already deep Windows path.
+    fd, name = tempfile.mkstemp(prefix='.c-', dir=path.parent)
+    temp = Path(name)
     try:
-        with temp.open('wb') as stream:
+        with os.fdopen(fd, 'wb') as stream:
             stream.write(data)
             stream.flush()
             os.fsync(stream.fileno())

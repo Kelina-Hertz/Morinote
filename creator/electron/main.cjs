@@ -26,6 +26,7 @@ app.setName('Morinote IDE');
 const profileDirectory = app.commandLine.getSwitchValue('user-data-dir');
 app.setPath('userData', profileDirectory ? path.resolve(profileDirectory) : path.join(app.getPath('appData'), 'Morinote-IDE-Offline'));
 const token = crypto.randomBytes(32).toString('hex');
+const mediaToken = crypto.randomBytes(32).toString('hex');
 const recovery = new RecoveryStore();
 const pendingSourceMutations = new Set();
 const SOURCE_MUTATIONS = new Set(['/api/workspace/save', '/api/workspace/restore', '/api/workspace/rename', '/api/workspace/operation', '/api/project/source']);
@@ -36,7 +37,7 @@ async function backendRequest(route, body, options = {}) {
   if (!serviceURL) throw new Error('本地制作服务尚未启动');
   let response, value;
   try {
-    response = await fetch(`${serviceURL}${route}`, { method, headers: { Authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+    response = await fetch(`${serviceURL}${route}`, { method, headers: { Authorization: `Bearer ${token}`, 'content-type': 'application/json',...(options.media?{'X-Creator-Media':mediaToken}:{}) },
       ...(method === 'POST' ? { body: JSON.stringify(body ?? {}) } : {}), signal: options.signal ?? AbortSignal.timeout(300000), redirect: 'error' });
     value = await response.json();
   } catch (cause) {
@@ -67,7 +68,7 @@ async function startBackend() {
     cwd: base, windowsHide: true, stdio: ['pipe', 'pipe', 'pipe'],
     env: { ...process.env, PYTHONUTF8: '1', PYTHONIOENCODING: 'utf-8', PYTHONDONTWRITEBYTECODE: '1' },
   });
-  backend.stdin.on('error',()=>{});backend.stdin.end(JSON.stringify({token})+'\n');
+  backend.stdin.on('error',()=>{});backend.stdin.end(JSON.stringify({token,mediaToken})+'\n');
   backend.on('error', error => { processError = error.message; });
   const keepOutput = chunk => { output = (output + chunk.toString('utf8')).slice(-6000); };
   backend.stdout.on('data', keepOutput); backend.stderr.on('data', keepOutput);
@@ -99,6 +100,7 @@ function registerIPC() {
   ipcMain.on('creator:source-result',(event,result)=>{if(!trustedSender(event,window,loadedURL))return;const entry=editorRequests.get(result?.id);if(!entry)return;editorRequests.delete(result.id);clearTimeout(entry.timer);if(entry.projectSession!==recovery.context?.session)return entry.reject(new Error('项目已切换。'));result.error?entry.reject(new Error(result.error)):entry.resolve(result.value);});
   handle('creator:request', async (route, body) => {
     const routePath = typeof route === 'string' ? route.split('?')[0] : '';
+    if(routePath.startsWith('/api/generated-media/'))throw new Error('生成产物只能经受管媒体任务入库。');
     if (closePending && ['/api/project/open', '/api/project/new', '/api/project/migrate'].includes(routePath)) throw new Error('正在备份并关闭编辑器，请先取消关闭再切换项目');
     if (pendingSourceMutations.size && ['/api/project/open', '/api/project/new', '/api/project/migrate'].includes(routePath)) throw new Error('源码保存尚未结束，完成后才能切换项目');
     if(['/api/project/open','/api/project/new','/api/project/migrate'].includes(routePath))await aiManager?.stop();
@@ -267,7 +269,11 @@ async function boot() {
     catch(error) {startupWarning=`无法打开${initial.remembered?'上次':'默认'}项目，请重新定位：${initial.path}。${error.message}`;}
   }
   const source=new SourceService({directory:app.getPath('userData'),request:backendRequest,editor:editorRequest,context:()=>recovery.context});
-  aiManager=new AIManager({directory:app.getPath('userData'),base:app.isPackaged?process.resourcesPath:path.resolve(__dirname,'..'),safeStorage,request:backendRequest,context:()=>recovery.context,source});
+  aiManager=new AIManager({directory:app.getPath('userData'),base:app.isPackaged?process.resourcesPath:path.resolve(__dirname,'..'),safeStorage,request:backendRequest,requestMedia:(route,body)=>backendRequest(route,body,{media:true}),decodeMedia:async(data,kind)=>{
+    if(kind==='image'){const image=require('electron').nativeImage.createFromBuffer(data);if(image.isEmpty())throw new Error('生成图片无法解码。');return image.getSize();}
+    if(!window||window.isDestroyed())throw new Error('编辑器已关闭，音频等待解码。');
+    return window.webContents.executeJavaScript('(async()=>{const context=new AudioContext();try{const raw=atob('+JSON.stringify(data.toString('base64'))+');const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));const decoded=await context.decodeAudioData(bytes.buffer);return {duration:decoded.duration};}finally{await context.close();}})()');
+  },context:()=>recovery.context,source});
   registerIPC(); createWindow();
   backend.on('exit', code => { if (!exiting && window) dialog.showErrorBox('本地服务已退出', `本地制作服务已退出（${code}），请重新启动 IDE。`); });
 }

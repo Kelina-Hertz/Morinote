@@ -5,8 +5,8 @@ import crypto from 'node:crypto';
 import {fileURLToPath} from 'node:url';
 
 export const skillName='morinote-ide';
-export const knowledgeVersion='2.1.0';
-export const sections=Object.freeze(['architecture','tracks','systems','assets','verification']);
+export const knowledgeVersion='2.3.0';
+export const sections=Object.freeze(['architecture','tracks','systems','assets','verification','media']);
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..','skills',skillName);
 
 export function readGuide(section){

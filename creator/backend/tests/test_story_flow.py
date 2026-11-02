@@ -78,7 +78,9 @@ class StoryFlowTests(unittest.TestCase):
                 labels={n['title'] for n in view['nodes'] if n['type']=='scene'}
                 self.assertTrue({'start','C1a','C1b1','C1b2','C1b3','C1c1','C1c2','C1c3','test_OVA'}<=labels)
                 self.assertFalse({'splashscreen','contact_friend_request','contact_empty_chat','contact_system_demo','_ui_qa_scene'}&labels)
-                self.assertEqual({g['title'] for g in view['groups']},{'序章','第一章 · 百团大会','番外'})
+                # The user's real project may add chapters; retain the required
+                # groups without treating every later chapter as a regression.
+                self.assertTrue({'序章','第一章 · 百团大会','番外'} <= {g['title'] for g in view['groups']})
             self.assertGreater(len(flow['nodes']),len(flow['storyDetail']['nodes']))
 
     def test_chapter_layout_metadata_does_not_promote_system_code_to_story(self):

@@ -42,9 +42,11 @@ def safe_path(root: Path, relative: str) -> Path:
 def atomic_json(path: Path, document: dict) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    temp = path.with_name(path.name + "." + uuid.uuid4().hex + ".tmp")
+    # A fixed-length sibling avoids MAX_PATH failures when a task result's
+    # filename is already a SHA256 digest. The destination stays unchanged.
+    temp = path.with_name(".creator-" + uuid.uuid4().hex + ".tmp")
     try:
-        with temp.open("w", encoding="utf-8", newline="\n") as stream:
+        with temp.open("x", encoding="utf-8", newline="\n") as stream:
             json.dump(document, stream, ensure_ascii=False, indent=2, allow_nan=False)
             stream.write("\n")
             stream.flush()

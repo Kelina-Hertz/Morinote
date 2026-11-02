@@ -46,6 +46,6 @@ export function toolFailed(result?:AIEvent):boolean{
 
 export function toolName(event:AIEvent):string{
  const name=String(eventData(event).name||'操作').replace(/^morinote_/,'');
- const names:Record<string,string>={read:'读取源码',write:'保存源码',edit:'修改源码',workspace:'查询剧情与演出',operate:'更新编辑稿',assets:'查询素材',files:'读取目录',project:'读取项目概览',checkpoint:'确认修改',catalog:'初始化工具',lint:'Ren’Py lint',test:'运行测试',preview:'启动试玩',skill:'读取制作指南',guide:'读取操作指南',terminal:'执行终端命令',analyze:'分析源码',validate:'检查源码',screenshot:'获取截图',preview_status:'查询试玩状态',stop_preview:'停止试玩',read_image:'读取图片'};
+ const names:Record<string,string>={generate_fragment:'生成片段候选',generate_media:'生成素材候选',creative_draft:'完善创作提示',creative_revise:'修改提示词',creative_candidates:'查看创作版本',creative_generate:'生成所选素材',creative_apply:'应用已验收结果',creative_preview:'试玩候选片段',creative_lint:'检查候选片段',read_candidate:'查看候选素材',read:'读取源码',write:'保存源码',edit:'修改源码',workspace:'查询剧情与演出',operate:'更新编辑稿',assets:'查询素材',files:'读取目录',project:'读取项目概览',checkpoint:'确认修改',catalog:'初始化工具',lint:'Ren’Py lint',test:'运行测试',preview:'启动试玩',skill:'读取制作指南',guide:'读取操作指南',terminal:'执行终端命令',analyze:'分析源码',validate:'检查源码',screenshot:'获取截图',preview_status:'查询试玩状态',stop_preview:'停止试玩',read_image:'读取图片'};
  return names[name]||name;
 }

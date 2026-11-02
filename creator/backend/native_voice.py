@@ -5,6 +5,24 @@ import re
 TOKEN = r"""(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')"""
 
 
+def generation_metadata(line, rows, start, end):
+    from .fragment_authoring import text_hash
+    for raw in rows[max(start, end-6):end]:
+        match = re.match(r'\s*# creator-(node|voice):\s*(\{.*\})\s*$', raw)
+        if not match:
+            continue
+        try:
+            value = json.loads(match[2])
+        except (TypeError, ValueError):
+            continue
+        if match[1] == 'node':
+            line['generatedNode'] = value
+        elif line.get('voice'):
+            rendered = line['text'].replace('[[', '[').replace('{{', '{')
+            speaker = str(line.get('speaker', '')).replace('[[', '[').replace('{{', '{')
+            line['voice']['generation'] = {**value, 'stale': value.get('textHash') != text_hash(rendered) or value.get('speakerName') != speaker}
+
+
 def parse(raw, path, number, constants, resource):
     if not re.match(r'\s*(?:voice\b|(?:play|stop|queue)\s+voice\b)',raw):return None
     from .native_stage import split_comment
@@ -46,6 +64,25 @@ def source_index(line, rows, index):
     return at
 
 
+def filename_pattern(root, project, documents=None):
+    from .workspace import read_overlay
+    from .native_tracks import literal
+    from .native_stage import split_comment
+    pattern = '{filename}'
+    for path in project['nativeRenpy']['codeFiles']:
+        if not path.endswith('.rpy'):
+            continue
+        for raw in read_overlay(root, path, documents)['content'].splitlines():
+            if 'voice_filename_format' not in raw:
+                continue
+            match = re.match(r'^\s*define\s+config\.voice_filename_format\s*=\s*(.*)', split_comment(raw)[0])
+            if match:
+                pattern = literal(match[1], {})
+                if not isinstance(pattern, str):
+                    raise ValueError('项目语音路径规则为动态表达式，请从源码绑定语音。')
+    return pattern
+
+
 def edit(project, op, document, index):
     from .renpy_import import SAY
     from .native_stage import split_comment
@@ -64,15 +101,7 @@ def edit(project, op, document, index):
         if not asset:raise ValueError('请选择当前项目的音频或虚拟语音素材。')
         filename=asset['nativeGamePath'];operand=filename
         # Native voice applies the game's filename formatter; do not prefix twice.
-        pattern='{filename}'
-        for path in project['nativeRenpy']['codeFiles']:
-            if not path.endswith('.rpy'):continue
-            for raw in read_overlay(op['_root'],path,op.get('documents'))['content'].splitlines():
-                if 'voice_filename_format' not in raw:continue
-                match=re.match(r'^\s*define\s+config\.voice_filename_format\s*=\s*(.*)',split_comment(raw)[0])
-                if match:
-                    pattern=literal(match[1],{})
-                    if not isinstance(pattern,str):raise ValueError('项目语音路径规则为动态表达式，请从源码绑定语音。')
+        pattern=filename_pattern(op['_root'],project,op.get('documents'))
         if at is None or line['voice']['command']!='play':
             if pattern!='{filename}':
                 if pattern.count('{filename}')!=1:raise ValueError('项目语音路径规则无法安全转换，请从源码绑定语音。')

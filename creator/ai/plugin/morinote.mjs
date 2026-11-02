@@ -6,6 +6,7 @@ import {spawn} from 'node:child_process';
 import {defineTool} from '@deepseek-ai/dsh-tools';
 import {createUserMessage} from '@deepseek-ai/dsh-llm';
 import {readGuide,sections} from './knowledge.mjs';
+import {ensureSnapshotRead} from './windows-snapshot-read.mjs';
 export const name='morinote-ide-tools';
 export const inject=['tools','sandbox','attachments'];
 const url=process.env.MORINOTE_BRIDGE_URL,token=process.env.MORINOTE_BRIDGE_TOKEN,workspace=path.resolve(process.env.MORINOTE_WORKSPACE),taskId=process.env.MORINOTE_TASK_ID;
@@ -42,6 +43,7 @@ async function confinedRun(ctx,descriptor,exec,{terminal=false}={}){
   if(!decision.approved)return {status:'denied',reason:decision.reason};
  }
  exec.signal.throwIfAborted();
+ await ensureSnapshotRead(confined,executionRoot,childEnv(),exec.signal);
  const log=path.resolve(descriptor.log);if(!log.startsWith(executionRoot+path.sep))throw new Error('日志目录越界。');fs.mkdirSync(path.dirname(log),{recursive:true});
  const fd=fs.openSync(log,'w');let child;
  try{child=spawn(confined.argv[0],confined.argv.slice(1),{cwd:descriptor.cwd,env:{...childEnv(descriptor.env),TEMP:temp,TMP:temp},windowsHide:true,stdio:['ignore',fd,fd]});}finally{fs.closeSync(fd);}
@@ -80,14 +82,14 @@ export async function apply(ctx){
  const delivered=new Set();
  ctx.on('agent/created',({agent:current})=>{agent=current;});
  ctx.on('agent/disposed',({agent:current})=>{if(agent===current)agent=null;});
- const controlTimer=setInterval(async()=>{if(!agent||agent.status==='idle'||controlling)return;controlling=true;try{const response=await bridge('/control',{stage:'poll',sessionId:agent.session.id,status:agent.status});for(const command of response.commands||[]){if(!delivered.has(command.id)){if(agent.status==='idle'){await bridge('/control',{stage:'ack',id:command.id,accepted:false});continue;}delivered.add(command.id);agent.steer(createUserMessage({content:[{type:'text',text:command.text}],source:{kind:'user'}}));}await bridge('/control',{stage:'ack',id:command.id,accepted:true});}}catch{}finally{controlling=false;}},120);
+ const controlTimer=setInterval(async()=>{if(controlling)return;controlling=true;try{const response=await bridge('/control',{stage:'poll',sessionId:agent?.session.id,status:agent?.status||'idle'});for(const execution of response.executions||[]){if(delivered.has(execution.id))continue;delivered.add(execution.id);const controller=new AbortController();void confinedRun(ctx,execution.descriptor,{signal:controller.signal,callId:execution.id,agent}).then(result=>bridge('/host-execution-result',{id:execution.id,result}),error=>bridge('/host-execution-result',{id:execution.id,result:{status:'failed',reason:String(error.message||error).slice(0,1000)}})).catch(()=>{});}for(const command of response.commands||[]){if(!delivered.has(command.id)){if(!agent||agent.status==='idle'){await bridge('/control',{stage:'ack',id:command.id,accepted:false});continue;}delivered.add(command.id);agent.steer(createUserMessage({content:[{type:'text',text:command.text}],source:{kind:'user'}}));}await bridge('/control',{stage:'ack',id:command.id,accepted:true});}}catch{}finally{controlling=false;}},120);
  ctx.on('dispose',()=>clearInterval(controlTimer));
  let streams=Promise.resolve();
  ctx.on('agent/assistant-stream',({frame})=>{if(frame.type==='chunk'&&frame.chunk?.type==='text-delta')streams=streams.then(()=>bridge('/stream',{frame})).catch(()=>{});});
  const catalog=await bridge('/tool',{name:'catalog',args:{},callId:'catalog-'+crypto.randomUUID()});
  // Refuse accidentally mounted built-in or future tools, including plugin installation.
  ctx.tools.guard(exec=>['skill','read','write','edit'].includes(exec.name)||exec.name.startsWith('morinote_')?undefined:'Morinote 只允许当前项目的受管工具和随附 Skill。');
- ctx.tools.register(defineTool({name:'morinote_guide',description:'Read only the specific guide needed for an actual editing task: architecture, tracks, systems, assets or verification. General discussion and capability questions need no guide or project query. Read-only installation documentation.',parameters:{section:{type:'string',required:true,enum:[...sections],description:'Guide section needed for this task.'}},output:{schema:{type:'json'},render},async execute(args,exec){exec.signal.throwIfAborted();return readGuide(args.section);}}));
+ if(process.env.MORINOTE_LOW_COST!=='1')ctx.tools.register(defineTool({name:'morinote_guide',description:'Read only the specific guide needed for an actual editing task: architecture, tracks, systems, assets or verification. General discussion and capability questions need no guide or project query. Read-only installation documentation.',parameters:{section:{type:'string',required:true,enum:[...sections],description:'Guide section needed for this task.'}},output:{schema:{type:'json'},render},async execute(args,exec){exec.signal.throwIfAborted();return readGuide(args.section);}}));
  for(const tool of catalog.tools){
   ctx.tools.register(defineTool({name:'morinote_'+tool.name,description:tool.description,parameters:tool.parameters,output:{schema:{type:'json'},render},async execute(args,exec){
    const callId=String(exec.callId);
@@ -108,7 +110,8 @@ export async function apply(ctx){
     }
     const after=before?.events?.reduce((n,e)=>Math.max(n,e.seq||0),0)||0;
     let value=await bridge('/tool',{name:tool.name,args,callId},exec.signal);
-    if(value.execution)value=await confinedRun(ctx,value.execution,exec);
+    const candidateVersion=value.candidateVersion;if(value.execution)value=await confinedRun(ctx,value.execution,exec);
+    if(['creative_preview','creative_lint'].includes(tool.name))await bridge('/fragment-result',{fragmentId:args.creativeId,phase:tool.name==='creative_preview'?'preview':'lint',result:{...value,candidateVersion}},exec.signal);
     if(tool.name==='stop_preview'){for(const job of jobs.values())await killTree(job.child);}
     if(tool.name==='screenshot'){
      await sleep(400,exec.signal);
@@ -124,7 +127,7 @@ export async function apply(ctx){
    })();calls.set(callId,execution);return execution;
   }}));
  }
- ctx.tools.register(defineTool({name:'morinote_terminal',description:'Request one PowerShell 7 command in an internal execution snapshot. Host approval follows the selected reviewer; text changes are imported through versioned source transactions. No persistent shell or unrestricted fallback.',parameters:{command:{type:'string',required:true,description:'Exact PowerShell command.'},purpose:{type:'string',required:true,description:'Why this command is necessary.'},timeoutSeconds:{type:'integer',description:'Timeout, at most 600 seconds.'}},output:{schema:{type:'json'},render},async execute(args,exec){
+ if(process.env.MORINOTE_LOW_COST!=='1')ctx.tools.register(defineTool({name:'morinote_terminal',description:'Request one PowerShell 7 command in an internal execution snapshot. Host approval follows the selected reviewer; text changes are imported through versioned source transactions. No persistent shell or unrestricted fallback.',parameters:{command:{type:'string',required:true,description:'Exact PowerShell command.'},purpose:{type:'string',required:true,description:'Why this command is necessary.'},timeoutSeconds:{type:'integer',description:'Timeout, at most 600 seconds.'}},output:{schema:{type:'json'},render},async execute(args,exec){
   const callId=String(exec.callId);if(calls.has(callId))return calls.get(callId);
   const command=args.command;if(!command.trim()||command.length>32000)throw new Error('命令为空或过长。');
   const execution=(async()=>{

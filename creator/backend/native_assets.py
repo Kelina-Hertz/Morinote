@@ -310,6 +310,12 @@ def edit(root, project, op):
         if kind not in TYPES: raise ValueError('请选择素材类型。')
         key = 'creator_' + eid
         runtime = {'kind': 'file' if kind in ('bgm', 'ambience', 'sound', 'voice') else 'image', 'key': '_creator_virtual/audio/' + eid + '.wav' if kind in ('bgm', 'ambience', 'sound', 'voice') else key}
+        if kind == 'voice':
+            from .native_voice import filename_pattern
+            pattern = filename_pattern(root, project, op.get('documents'))
+            if pattern.count('{filename}') != 1:
+                raise ValueError('项目语音路径规则无法安全转换，请从源码绑定语音。')
+            runtime['key'] = pattern.format(filename=runtime['key'])
         entry = {'id': eid, 'runtime': runtime, 'name': str(op.get('name', '')).strip(), 'type': kind,
             'binding': None, 'override': True, 'temporary': False, 'character': '', 'costume': '', 'expression': '', 'category': '', 'requirement': str(op.get('name', '')).strip()}
         data['entries'].append(entry)
@@ -357,4 +363,4 @@ def edit(root, project, op):
             value['targetPath'] = physical.get('nativeGamePath', '')
         else: value['targetPath'] = ''
     validate(data)
-    return {'path': REGISTRY, 'hash': document['hash'], 'content': render_table(data)}
+    return {'path': REGISTRY, 'hash': document['hash'], 'content': render_table(data), 'entryId': entry['id'] if entry else None}

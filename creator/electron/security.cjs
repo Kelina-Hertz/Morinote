@@ -4,6 +4,8 @@ const { fileURLToPath } = require('node:url');
 const path = require('node:path');
 
 const ROUTES = new Map([
+  ...['register','import','preview','prepare'].map(name=>['/api/generated-media/'+name,'POST']),
+  ...['validate','prepare'].map(name=>['/api/fragment/'+name,'POST']),
   ...['new','list','diff','prepare','rebase','mark','tool','execution','terminal','bridge','stop'].map(name=>['/api/ai/'+name,'POST']),
   ['/api/project', 'GET'], ['/api/project/new', 'POST'], ['/api/project/open', 'POST'],
   ['/api/project/save', 'POST'], ['/api/project/validate', 'POST'], ['/api/project/migrate', 'POST'],
